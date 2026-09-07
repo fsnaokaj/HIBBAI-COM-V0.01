@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hibbai! Forums</title>
+<style>
+  :root{
+    --green: #FF5A36;
+    --green-dark: #E14F3D;
+    --ink: #1a1a1a;
+    --muted: #6b7a72;
+    --border: #d8ded9;
+    --deal-bg: #dff5e6;
+    --shen-bg: #fbf0cf;
+    --info-bg: #d9f0f5;
+    --artist-bg: #d7f5e2;
+    --ebw-bg: #fbe3f0;
+    --pill-bg: #3A1440;
+    --link: #B34700;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:#fff;
+  }
+  a{ color: var(--link); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  /* top bar */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .crumbs a{ font-size:14px; font-weight:600; color:var(--ink); }
+  .topbar .crumbs a:hover{ color: var(--green-dark); }
+  .topbar .actions{ display:flex; align-items:center; gap:14px; }
+  .login-btn{
+    background: linear-gradient(135deg, #F7E7CE, #D9BE8F);
+    color:#3A1440;
+    border:1px solid #C9A66B;
+    border-radius:20px;
+    padding:8px 16px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  }
+  .login-btn:hover{ background: linear-gradient(135deg, #F9EFDC, #E2C99A); }
+  .icon-btn{
+    width:34px;height:34px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--border);
+    background:#fff; cursor:pointer; color:var(--muted);
+  }
+
+  /* hero banner */
+  .banner{
+    background: var(--green);
+    position:relative;
+    padding: 40px 24px 44px;
+    overflow:hidden;
+    text-align:center;
+  }
+  .banner-inner{
+    max-width:1100px;
+    margin:0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:28px;
+    position:relative;
+  }
+  .banner-inner a{ display:flex; align-items:center; gap:14px; text-decoration:none; cursor:pointer; }
+  .banner-mark{ flex-shrink:0; filter: drop-shadow(3px 3px 0 rgba(26,26,26,0.15)); }
+  .wordmark{
+    font-size:64px;
+    font-weight:900;
+    font-style:italic;
+    letter-spacing:1px;
+    color:#fff;
+    -webkit-text-stroke: 3px var(--ink);
+    text-shadow: 4px 4px 0 var(--ink);
+  }
+  .welcome{
+    font-family: Georgia, "Times New Roman", serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:28px;
+    color:var(--ink);
+    line-height:1.15;
+  }
+  .bubble{
+    position:absolute;
+    font-weight:800;
+    padding:6px 12px;
+    border-radius: 40% 40% 40% 4px;
+    font-size:15px;
+    color:var(--ink);
+    transform: rotate(-6deg);
+  }
+  .bubble.b1{ background:#f4c04a; top:6px; left:2%; border-radius:6px 40% 40% 40%; }
+  .bubble.b2{ background:#e9a7d6; top:0; left:16%; border-radius:50%; padding:14px; }
+  .bubble.b3{ background:#7fe0a0; bottom:2px; left:2%; border-radius:40% 6px 40% 40%; transform:rotate(4deg);}
+  .bubble.b4{ background:#f28fc0; top:2px; right:2%; border-radius:4px 40% 40% 40%; transform:rotate(6deg); font-size:22px;}
+  .bubble.b5{ background:#f6d24a; top:34px; right:14%; border-radius:50%; padding:12px; transform:rotate(0);}
+  .bubble.b6{ background:#3fb8c9; bottom:0; right:0%; border-radius:40% 40% 4px 40%; transform:rotate(-3deg);}
+
+  /* action buttons row */
+  .cta-row{
+    display:flex; justify-content:center; gap:14px;
+    padding: 22px 16px;
+  }
+  .cta-btn{
+    background:#f0f0ee;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:10px 18px;
+    font-size:14px;
+    font-weight:600;
+    color:var(--ink);
+    cursor:pointer;
+    display:flex; align-items:center; gap:8px;
+  }
+
+  /* notice */
+  .notice{
+    background: var(--deal-bg);
+    text-align:center;
+    padding:12px 16px;
+    font-size:13px;
+    margin: 0 24px 16px;
+    border-radius:4px;
+  }
+
+  .container{ max-width:1200px; margin:0 auto; padding: 0 24px 60px; }
+
+  .tabs-row{
+    display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap;
+  }
+  .tab-chip{
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:7px 14px;
+    font-size:14px;
+    font-weight:600;
+    background:#fff;
+    cursor:pointer;
+    display:flex; align-items:center; gap:4px;
+  }
+  .tab-plain{
+    font-size:14px; font-weight:600; color:var(--ink);
+    padding:7px 6px; cursor:pointer; border-bottom:2px solid transparent;
+  }
+  .tab-plain.active{ border-bottom-color: var(--ink); }
+
+  .updated-banner{
+    background: var(--deal-bg);
+    padding:10px 16px;
+    font-size:14px;
+    border-radius:4px;
+    margin-bottom: 10px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap:0 40px;
+    align-items:start;
+  }
+  .grid.full{ grid-template-columns: 1fr; }
+  .grid.full #categoryCol{ display:none; }
+
+  .col-head{
+    display:flex; justify-content:space-between;
+    font-size:13px; color:var(--muted); font-weight:600;
+    padding: 10px 4px;
+    border-bottom:1px solid var(--border);
+  }
+
+  /* category rows */
+  .cat-row{
+    display:flex;
+    padding: 20px 16px;
+    border-left: 5px solid transparent;
+    border-bottom: 1px solid #fff;
+    gap: 18px;
+  }
+  .cat-row.deal{ background:var(--deal-bg); border-left-color: var(--green-dark); }
+  .cat-row.shen{ background:var(--shen-bg); border-left-color:#d99a1c; }
+  .cat-row.info{ background:var(--info-bg); border-left-color:#1f7a95; }
+  .cat-row.artist{ background:var(--artist-bg); border-left-color:#2a9d5c; }
+  .cat-row.ebw{ background:var(--ebw-bg); border-left-color:#b23a6b; }
+
+  .cat-icon{
+    font-size:30px;
+    width:56px; height:56px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .cat-body{ flex:1; }
+  .cat-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .cat-badge{
+    display:inline-block;
+    font-weight:800;
+    font-style:italic;
+    font-size:15px;
+    color:#fff;
+    padding: 3px 10px;
+    border-radius:4px;
+    margin-bottom:4px;
+  }
+  .cat-badge.deal1{ background: var(--pill-bg); }
+  .cat-badge.deal2{ background:#E14F3D; margin-left:2px;}
+  .cat-badge.shen1{ background:#c94b1c; }
+  .cat-badge.shen2{ background:#f2a71c; margin-left:2px; color:#3a2a00;}
+  .cat-badge.info1{ background:#0e2f57; }
+  .cat-badge.info2{ background:#1f9ec9; margin-left:2px;}
+  .cat-badge.artist1{ background:#0f5a2f; }
+  .cat-badge.artist2{ background:#E14F3D; margin-left:2px;}
+  .cat-badge.ebw1{ background:#8a1c47; }
+  .cat-badge.ebw2{ background:#e35a9a; margin-left:2px;}
+
+  .cat-desc{
+    font-size:14px; line-height:1.5; color:#333; margin: 10px 0 12px; max-width:520px;
+  }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .tag{
+    background: var(--pill-bg);
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+    padding:4px 10px;
+    border-radius:4px;
+  }
+  .cat-count{
+    font-size:14px; font-weight:700; text-align:right; white-space:nowrap;
+  }
+  .cat-count small{ display:block; font-weight:500; color:var(--muted); font-size:12px; }
+
+  /* latest sidebar */
+  .latest-list{ border-top:1px solid var(--border); }
+  .latest-item{
+    display:flex; gap:12px; align-items:flex-start;
+    padding: 14px 4px;
+    border-bottom:1px solid var(--border);
+  }
+  .avatar{
+    width:42px; height:42px; border-radius:50%;
+    background:#eee; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px;
+  }
+  .latest-body{ flex:1; min-width:0; }
+  .latest-title{
+    font-size:14.5px; font-weight:600; color:var(--ink); line-height:1.3;
+    display:block; margin-bottom:6px;
+  }
+  .latest-title:hover{ color: var(--green-dark); }
+  .latest-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .cat-pill{
+    font-size:11px; font-weight:700; padding:2px 8px; border-radius:3px; color:#fff;
+  }
+  .cat-pill.shen{ background:#e05a2b; }
+  .cat-pill.ebw{ background:#b23a6b; }
+  .cat-pill.computers{ background:#0f5a2f; }
+  .cat-pill.home{ background:#0f5a2f; }
+  .cat-pill.grocery{ background:#0f5a2f; }
+  .word-pill{
+    font-size:11px; font-weight:600; color:var(--muted); padding:2px 4px;
+  }
+  .latest-meta{
+    text-align:right; font-size:13px; color:var(--muted); white-space:nowrap; flex-shrink:0;
+  }
+  .latest-meta .count{ display:block; font-weight:700; color:var(--ink); }
+  .latest-meta .count.orange{ color:#c9611c; }
+
+  .more-btn{
+    display:block; margin-left:auto; margin-top:14px;
+    background:#fff; border:1px solid var(--border); border-radius:6px;
+    padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+
+  @media (max-width: 860px){
+    .grid{ grid-template-columns: 1fr; }
+    .wordmark{ font-size:40px; }
+    .welcome{ font-size:18px; }
+    .banner-inner{ flex-direction:column; gap:12px; }
+    .banner-mark{ width:52px; height:52px; }
+    .bubble{ display:none; }
+    .cta-row{ flex-wrap:wrap; }
+  }
+  /* toast */
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* modal */
+  .modal-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none;
+    align-items:center; justify-content:center; z-index:1000; padding:20px;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal-box{
+    background:#fff; border-radius:10px; max-width:520px; width:100%;
+    padding:26px; position:relative; max-height:80vh; overflow-y:auto;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none;
+    font-size:20px; cursor:pointer; color:var(--muted);
+  }
+  .modal-box h3{ margin:0 0 6px; font-size:19px; }
+  .modal-box .modal-meta{ font-size:12.5px; color:var(--muted); margin-bottom:14px; }
+  .modal-box p{ font-size:14px; line-height:1.6; color:#333; }
+
+  /* dropdown menu (hamburger) */
+  .menu-dropdown{
+    position:absolute; top:56px; right:24px; background:#fff; border:1px solid var(--border);
+    border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:none; min-width:180px; z-index:50;
+    overflow:hidden;
+  }
+  .menu-dropdown.open{ display:block; }
+  .menu-dropdown a{
+    display:block; padding:11px 16px; font-size:14px; font-weight:600; color:var(--ink);
+    border-bottom:1px solid var(--border);
+  }
+  .menu-dropdown a:last-child{ border-bottom:none; }
+  .menu-dropdown a:hover{ background:#f4f6f5; text-decoration:none; }
+
+  /* search box */
+  .search-box{
+    position:absolute; top:56px; right:24px; background:#fff; border:1px solid var(--border);
+    border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:none; padding:10px; z-index:50;
+  }
+  .search-box.open{ display:block; }
+  .search-box input{
+    border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:14px; width:220px;
+  }
+
+  .icon-btn.active{ background:var(--green); color:#fff; border-color:var(--green); }
+
+  /* dark mode */
+  body.dark{ background:#14181a; color:#eaeee9; }
+  body.dark .topbar{ background:#1c2124; border-color:#2b3236; }
+  body.dark .topbar .crumbs a{ color:#eaeee9; }
+  body.dark .icon-btn{ background:#1c2124; border-color:#2b3236; color:#eaeee9; }
+  body.dark .notice{ background:#1c3a2a; color:#dff5e6; }
+  body.dark .updated-banner{ background:#1c3a2a; color:#dff5e6; }
+  body.dark .tab-chip{ background:#1c2124; border-color:#2b3236; color:#eaeee9; }
+  body.dark .tab-plain{ color:#eaeee9; }
+  body.dark .tab-plain.active{ border-bottom-color:#eaeee9; }
+  body.dark .cat-desc{ color:#cfd6d2; }
+  body.dark .col-head{ color:#9aa7a1; border-color:#2b3236; }
+  body.dark .latest-item{ border-color:#2b3236; }
+  body.dark .latest-title{ color:#eaeee9; }
+  body.dark .more-btn{ background:#1c2124; border-color:#2b3236; color:#eaeee9; }
+  body.dark .modal-box{ background:#1c2124; color:#eaeee9; }
+  body.dark .modal-box p{ color:#cfd6d2; }
+
+  /* leaderboard */
+  .leaderboard{ margin-top:26px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .leaderboard-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); }
+  .leaderboard-head h3{ margin:0; font-size:15px; }
+  .lb-toggle{ display:flex; gap:6px; }
+  .lb-toggle-btn{
+    background:#f0f0ee; border:1px solid var(--border); border-radius:14px; padding:4px 12px;
+    font-size:11.5px; font-weight:700; cursor:pointer; color:var(--muted);
+  }
+  .lb-toggle-btn.active{ background:var(--pill-bg); color:#fff; border-color:var(--pill-bg); }
+  .lb-row{ display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .lb-row:last-child{ border-bottom:none; }
+  .lb-rank{ width:20px; font-weight:800; color:var(--muted); }
+  .lb-rank.gold{ color:#c9611c; }
+  .lb-avatar{ width:30px; height:30px; border-radius:50%; background:var(--deal-bg); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .lb-name{ flex:1; font-weight:600; }
+  .lb-points{ font-weight:700; color:var(--green-dark); }
+  body.dark .leaderboard{ border-color:#2b3236; }
+  body.dark .leaderboard-head{ border-color:#2b3236; }
+  body.dark .lb-row{ border-color:#2b3236; }
+  body.dark .lb-toggle-btn{ background:#1c2124; border-color:#2b3236; color:#eaeee9; }
+</style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal();">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h3 id="modalTitle"></h3>
+      <div class="modal-meta" id="modalMeta"></div>
+      <p id="modalBody"></p>
+    </div>
+  </div>
+
+  <div class="topbar">
+    <div class="crumbs">
+      <a href="hibbai_shop.html">Shop Hibbai Deals</a> / <a href="hibbai_forums.html" onclick="location.reload(); return false;">Forums Home</a>
+    </div>
+    <div class="actions" style="position:relative;">
+      <button class="login-btn" id="loginBtn" onclick="window.location.href='hibbai_account.html'">👤 Log In</button>
+      <div class="icon-btn" id="darkToggle" onclick="toggleDark()">◐</div>
+      <div class="icon-btn" id="searchToggle" onclick="toggleSearch()">🔍</div>
+      <div class="icon-btn" id="menuToggle" onclick="toggleMenu()">☰</div>
+      <div class="search-box" id="searchBox">
+        <input type="text" id="searchInput" placeholder="Search topics…" oninput="filterTopics()">
+      </div>
+      <div class="menu-dropdown" id="menuDropdown">
+        <a href="hibbai_forums.html" onclick="location.reload(); return false;">Forums Home</a>
+        <a href="#" onclick="setTab('categories'); closeMenu(); return false;">Categories</a>
+        <a href="#" onclick="setTab('latest'); closeMenu(); return false;">Latest</a>
+        <a href="#" onclick="setTab('top'); closeMenu(); return false;">Top</a>
+        <a href="hibbai_account.html">Log In</a>
+        <a href="hibbai_shop.html">Shop Hibbai Deals</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="bubble b1">OMG</div>
+    <div class="bubble b2">XD</div>
+    <div class="bubble b3">LOL</div>
+    <div class="bubble b4">WTF?!</div>
+    <div class="bubble b5">?!</div>
+    <div class="bubble b6">???</div>
+    <div class="banner-inner">
+      <a href="hibbai_forums.html" onclick="location.reload(); return false;">
+        <svg class="banner-mark" width="74" height="74" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.6"/>
+          <circle cx="11" cy="13.5" r="1.9" fill="#1a1a1a"/>
+          <circle cx="19" cy="13.5" r="1.9" fill="#1a1a1a"/>
+          <path d="M11 18.5C12.6 20.6 17.4 20.6 19 18.5" stroke="#1a1a1a" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="wordmark">HIBBAI!</div>
+      </a>
+      <div class="welcome">Welcome to<br>our community!</div>
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button class="cta-btn" onclick="openModal('Share Your Crap!!', 'Community', 'Post a photo of a recent Hibbai haul, a weird package your carrier mangled, or anything else you want the forum to see. Uploads work from the compose box on any topic — start a new one in Deal Chatter or Everything but Hibbai to share yours.')">❓ share your crap!!</button>
+    <button class="cta-btn" onclick="openModal('Giveaway! Enter by 9/7 @ noon CT', 'Shenanigans · 1.8k replies', 'Reply in the pinned Shenanigans thread before 9/7 at noon CT for a chance to win. One entry per Hibber — winners get picked at random and announced right in the thread.')">🎟️ giveaway! enter by 9/7 @ noon ct</button>
+  </div>
+
+  <div class="notice">
+    ** Please allow 3-4 days for customer service to respond. Do not send multiple emails. Thank you for your patience.
+  </div>
+
+  <div class="container">
+    <div class="tabs-row">
+      <div class="tab-chip" onclick="toast('Browse by category')">categories &rsaquo;</div>
+      <div class="tab-chip" onclick="toast('Browse by tag')">tags &rsaquo;</div>
+      <div class="tab-plain active" id="tabCategories" onclick="setTab('categories')">Categories</div>
+      <div class="tab-plain" id="tabLatest" onclick="setTab('latest')">Latest</div>
+      <div class="tab-plain" id="tabTop" onclick="setTab('top')">Top</div>
+    </div>
+
+    <div class="updated-banner">See 1 new or updated topic</div>
+
+    <div class="grid" id="mainGrid">
+      <!-- LEFT: categories -->
+      <div id="categoryCol">
+        <div class="col-head"><span>Category</span><span>Topics</span></div>
+
+        <div class="cat-row deal">
+          <div class="cat-icon">🎉</div>
+          <div class="cat-body">
+            <div class="cat-top">
+              <div>
+                <span class="cat-badge deal1">Deal</span><span class="cat-badge deal2">Chatter</span>
+              </div>
+              <div class="cat-count">10.2k<small>/ week</small></div>
+            </div>
+            <p class="cat-desc">Wanna know more about a great deal? Jump in here to see what others are saying, compare reviews, and offer your own!</p>
+            <div class="tag-row">
+              <span class="tag">Daily Deal</span><span class="tag">Flash-Off</span><span class="tag">Clearance</span>
+              <span class="tag">Computers</span><span class="tag">Electronics</span><span class="tag">Gourmet</span>
+              <span class="tag">Home &amp; Kitchen</span><span class="tag">Shirt</span><span class="tag">Tools &amp; Garden</span>
+              <span class="tag">Sports &amp; Outdoors</span><span class="tag">Grocery &amp; Household</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cat-row shen">
+          <div class="cat-icon">🎭</div>
+          <div class="cat-body">
+            <div class="cat-top">
+              <div><span class="cat-badge shen1">Shenanigans</span></div>
+              <div class="cat-count">91<small>/ week</small></div>
+            </div>
+            <p class="cat-desc">We do a lot of silly stuff: Mystery Grab Bags (MGBs), Deal Meter, Wacky Pricing, giveaways, and more. Come play along with us.</p>
+            <div class="tag-row"><span class="tag">Design Derby</span></div>
+          </div>
+        </div>
+
+        <div class="cat-row info">
+          <div class="cat-icon">📢</div>
+          <div class="cat-body">
+            <div class="cat-top">
+              <div><span class="cat-badge info1">Information</span><span class="cat-badge info2">Desk</span></div>
+              <div class="cat-count">28<small>/ week</small></div>
+            </div>
+            <p class="cat-desc">Read announcements, learn tips and tricks about Hibbai, and catch up on all the important goings-on from Hibbers and staff. Note that customer service does not monitor the forums. Please use the support form.</p>
+          </div>
+        </div>
+
+        <div class="cat-row artist">
+          <div class="cat-icon">✏️</div>
+          <div class="cat-body">
+            <div class="cat-top">
+              <div><span class="cat-badge artist1">Artist</span><span class="cat-badge artist2">Central</span></div>
+              <div class="cat-count">2<small>/ week</small></div>
+            </div>
+            <p class="cat-desc">Shirt artists! This is your home. Give and get feedback on designs, learn about the derby, or just pontificate about ringspun cotton.</p>
+          </div>
+        </div>
+
+        <div class="cat-row ebw">
+          <div class="cat-icon">🚫</div>
+          <div class="cat-body">
+            <div class="cat-top">
+              <div><span class="cat-badge ebw1">Everything</span><span class="cat-badge ebw2">But Hibbai</span></div>
+              <div class="cat-count">1<small>/ week</small></div>
+            </div>
+            <p class="cat-desc">Topics that don't need a category, or don't fit into any other existing category.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: latest -->
+      <div id="latestCol">
+        <div class="col-head"><span id="latestColLabel">Latest</span><span></span></div>
+        <div class="latest-list" id="latestList">
+
+          <div class="latest-item">
+            <div class="avatar">🎓</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">📌 Giveaway! Enter by 9/7 @ noon CT</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">1.8k</span>1m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🎲</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">🎲 Just for Fun! Dice Game (Part 67)</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">6.9k</span>1m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">📦</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">📦 Share your 2026 Craps Here!</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">2.2k</span>3m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🐨</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">Pointless pushes are here! (Part 4)</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count orange">13.8k</span>4m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🐱</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">Cozy Corner 27: 🧀 Hanker for a hunk of cheese.</a>
+              <div class="latest-tags">
+                <span class="cat-pill ebw">Everything but Hibbai</span>
+                <span class="word-pill">chat</span>
+              </div>
+            </div>
+            <div class="latest-meta"><span class="count orange">13.8k</span>5m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🐕</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">GAME 🧩 Pips</a>
+              <div class="latest-tags">
+                <span class="cat-pill ebw">Everything but Hibbai</span>
+                <span class="word-pill">games</span>
+              </div>
+            </div>
+            <div class="latest-meta"><span class="count orange">2.1k</span>7m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🌐</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">3-word Endless Story — Join in!!</a>
+              <div class="latest-tags">
+                <span class="cat-pill ebw">Everything but Hibbai</span>
+                <span class="word-pill">games</span>
+              </div>
+            </div>
+            <div class="latest-meta"><span class="count orange">7.3k</span>9m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🌐</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">GAME: GIF: Part 3 (Part 2)</a>
+              <div class="latest-tags">
+                <span class="cat-pill ebw">Everything but Hibbai</span>
+                <span class="word-pill">games</span>
+              </div>
+            </div>
+            <div class="latest-meta"><span class="count orange">5.5k</span>10m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">💻</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">Amazon Basics 14" Laptop Tablet Bag 24 pack</a>
+              <div class="latest-tags"><span class="cat-pill computers">Computers</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">12</span>21m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🤖</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">iRobot C755920 iRobot® Roomba Combo™ J7+</a>
+              <div class="latest-tags"><span class="cat-pill home">Home &amp; Kitchen</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">2</span>25m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🎭</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">How many answers does this poll have?</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">37</span>27m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🧻</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">Amazon Basics 2-Ply Ultra Facial Tissue with</a>
+              <div class="latest-tags"><span class="cat-pill grocery">Grocery &amp; Household</span></div>
+            </div>
+            <div class="latest-meta"><span class="count">14</span>29m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🎭</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">OMG! We have TWO new Volunteer Moderators!</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count orange">5.6k</span>34m</div>
+          </div>
+
+          <div class="latest-item">
+            <div class="avatar">🎭</div>
+            <div class="latest-body">
+              <a class="latest-title" href="#">OMG! We have a new volunteer moderator!!!</a>
+              <div class="latest-tags"><span class="cat-pill shen">Shenanigans</span></div>
+            </div>
+            <div class="latest-meta"><span class="count orange">5.5k</span>35m</div>
+          </div>
+
+        </div>
+        <button class="more-btn" id="moreBtn" onclick="loadMore()">More</button>
+
+        <div class="leaderboard" id="leaderboard">
+          <div class="leaderboard-head">
+            <h3>Top Hibbers</h3>
+            <div class="lb-toggle">
+              <button class="lb-toggle-btn active" data-range="week" onclick="setLeaderboardRange('week')">This Week</button>
+              <button class="lb-toggle-btn" data-range="alltime" onclick="setLeaderboardRange('alltime')">All Time</button>
+            </div>
+          </div>
+          <div id="leaderboardList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- shared account check (read-only here) ----
+    function safeGet(key, fallback){
+      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    const HibbaiAuth = {
+      getSession(){ return safeGet('hibbai_session', null); },
+      getAccounts(){ return safeGet('hibbai_accounts', []); },
+      findAccount(email){ return this.getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase()); },
+      getCurrentUser(){
+        const s = this.getSession();
+        if (!s) return null;
+        return this.findAccount(s.email) || { name: s.email.split('@')[0], email: s.email };
+      }
+    };
+    document.addEventListener('DOMContentLoaded', function(){
+      const user = HibbaiAuth.getCurrentUser();
+      if (user) document.getElementById('loginBtn').textContent = '👤 Hi, ' + user.name.split(' ')[0];
+    });
+
+    // ---- toast ----
+    let toastTimer;
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+    }
+
+    // ---- modal ----
+    function openModal(title, meta, body){
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMeta').textContent = meta;
+      document.getElementById('modalBody').textContent = body;
+      document.getElementById('modalBackdrop').classList.add('open');
+    }
+    function closeModal(){
+      document.getElementById('modalBackdrop').classList.remove('open');
+    }
+
+    // ---- topic click delegation ----
+    document.getElementById('latestList').addEventListener('click', function(e){
+      const a = e.target.closest('.latest-title');
+      if (!a) return;
+      e.preventDefault();
+      const item = a.closest('.latest-item');
+      const tagEl = item.querySelector('.cat-pill');
+      const wordEl = item.querySelector('.word-pill');
+      const metaEl = item.querySelector('.latest-meta');
+      const meta = (tagEl ? tagEl.textContent : '') + (wordEl ? ' · ' + wordEl.textContent : '') + ' · ' + metaEl.textContent.trim();
+      openModal(a.textContent.trim(), meta, 'This is a preview — open the real thread on forums.hibbai.com to read replies and join the conversation.');
+    });
+
+    document.getElementById('categoryCol').addEventListener('click', function(e){
+      const row = e.target.closest('.cat-row');
+      if (!row) return;
+      const badges = [...row.querySelectorAll('.cat-badge')].map(b => b.textContent).join(' ');
+      const desc = row.querySelector('.cat-desc') ? row.querySelector('.cat-desc').textContent.trim() : '';
+      const count = row.querySelector('.cat-count').textContent.trim();
+      openModal(badges, count, desc);
+    });
+
+    // ---- tabs ----
+    function parseCount(text){
+      text = text.trim();
+      if (text.endsWith('k')) return parseFloat(text) * 1000;
+      return parseFloat(text) || 0;
+    }
+    function setTab(which){
+      document.getElementById('tabCategories').classList.toggle('active', which === 'categories');
+      document.getElementById('tabLatest').classList.toggle('active', which === 'latest');
+      document.getElementById('tabTop').classList.toggle('active', which === 'top');
+      const grid = document.getElementById('mainGrid');
+      const label = document.getElementById('latestColLabel');
+      const list = document.getElementById('latestList');
+      if (which === 'categories'){
+        grid.classList.remove('full');
+        label.textContent = 'Latest';
+      } else {
+        grid.classList.add('full');
+        label.textContent = which === 'top' ? 'Top' : 'Latest';
+        const items = [...list.querySelectorAll('.latest-item')];
+        if (which === 'top'){
+          items.sort((a,b) => parseCount(b.querySelector('.count').textContent) - parseCount(a.querySelector('.count').textContent));
+        } else {
+          items.sort((a,b) => a.dataset.order - b.dataset.order);
+        }
+        items.forEach(i => list.appendChild(i));
+      }
+      toast('Showing ' + (which.charAt(0).toUpperCase() + which.slice(1)));
+    }
+    document.querySelectorAll('#latestList .latest-item').forEach((item, i) => item.dataset.order = i);
+
+    // ---- search ----
+    function toggleSearch(){
+      document.getElementById('searchBox').classList.toggle('open');
+      document.getElementById('menuDropdown').classList.remove('open');
+    }
+    function filterTopics(){
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      document.querySelectorAll('#latestList .latest-item').forEach(item => {
+        const title = item.querySelector('.latest-title').textContent.toLowerCase();
+        item.style.display = title.includes(q) ? '' : 'none';
+      });
+    }
+
+    // ---- hamburger menu ----
+    function toggleMenu(){
+      document.getElementById('menuDropdown').classList.toggle('open');
+      document.getElementById('searchBox').classList.remove('open');
+    }
+    function closeMenu(){
+      document.getElementById('menuDropdown').classList.remove('open');
+    }
+    document.addEventListener('click', function(e){
+      if (!e.target.closest('.actions')){
+        document.getElementById('menuDropdown').classList.remove('open');
+        document.getElementById('searchBox').classList.remove('open');
+      }
+    });
+
+    // ---- dark mode ----
+    function toggleDark(){
+      document.body.classList.toggle('dark');
+      document.getElementById('darkToggle').classList.toggle('active');
+    }
+
+    // ---- load more ----
+    let moreLoaded = false;
+    function loadMore(){
+      const list = document.getElementById('latestList');
+      if (moreLoaded){
+        toast('No more topics to load');
+        return;
+      }
+      const extras = [
+        ['🧦', 'Sock Derby: vote for the ugliest pair', 'shen', 'Shenanigans', '412', '41m'],
+        ['🎧', 'JBL Clip 5 Waterproof Speaker', 'computers', 'Electronics', '9', '44m'],
+        ['🌵', 'Caption This Cactus (Part 12)', 'ebw', 'Everything but Hibbai', '3.4k', '48m']
+      ];
+      extras.forEach(([emoji, title, pillClass, pillLabel, count, time]) => {
+        const div = document.createElement('div');
+        div.className = 'latest-item';
+        div.dataset.order = document.querySelectorAll('#latestList .latest-item').length;
+        div.innerHTML = `<div class="avatar">${emoji}</div>
+          <div class="latest-body">
+            <a class="latest-title" href="#">${title}</a>
+            <div class="latest-tags"><span class="cat-pill ${pillClass}">${pillLabel}</span></div>
+          </div>
+          <div class="latest-meta"><span class="count">${count}</span>${time}</div>`;
+        list.appendChild(div);
+      });
+      moreLoaded = true;
+      document.getElementById('moreBtn').textContent = 'No more topics';
+      toast('Loaded more topics');
+    }
+
+    // ---- leaderboard ----
+    const leaderboardData = {
+      week: [
+        { name: 'GreenGrottoGary', avatar: '🐊', pts: 4820 },
+        { name: 'DealOMeterDan', avatar: '📟', pts: 3910 },
+        { name: 'ShirtDerbySal', avatar: '👕', pts: 3475 },
+        { name: 'BocBandit', avatar: '📦', pts: 2960 },
+        { name: 'HibbaiWriterFan', avatar: '🎓', pts: 2210 }
+      ],
+      alltime: [
+        { name: 'BocBandit', avatar: '📦', pts: 88410 },
+        { name: 'GreenGrottoGary', avatar: '🐊', pts: 76200 },
+        { name: 'PipsPlayerOne', avatar: '🐶', pts: 61550 },
+        { name: 'ShirtDerbySal', avatar: '👕', pts: 54890 },
+        { name: 'DealOMeterDan', avatar: '📟', pts: 49020 }
+      ]
+    };
+    function setLeaderboardRange(range){
+      document.querySelectorAll('.lb-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = leaderboardData[range].map((u, i) => `
+        <div class="lb-row">
+          <span class="lb-rank ${i===0 ? 'gold' : ''}">${i+1}</span>
+          <span class="lb-avatar">${u.avatar}</span>
+          <span class="lb-name">${u.name}</span>
+          <span class="lb-points">${u.pts.toLocaleString()} pts</span>
+        </div>
+      `).join('');
+    }
+    setLeaderboardRange('week');
+  </script>
+
+</body>
+</html>

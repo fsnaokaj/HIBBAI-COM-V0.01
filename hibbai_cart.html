@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart - Hibbai!</title>
+<style>
+  :root{
+    --hibbai-green:#FF5A36;
+    --hibbai-green-dark:#E14F3D;
+    --hibbai-ink:#1a1a1a;
+    --hibbai-pill:#3A1440;
+    --hibbai-muted:#6b7a72;
+    --hibbai-border:#d8ded9;
+    --hibbai-link:#B34700;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:"Helvetica Neue", Arial, sans-serif; color:var(--hibbai-ink); background:#fff; }
+  a{ color:var(--hibbai-link); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  .main-nav{ background: var(--hibbai-green); padding: 14px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .logo-block{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    background:#fff; border-radius:8px; padding:7px 14px 7px 10px; line-height:1; text-decoration:none;
+  }
+  .logo-mark{ flex-shrink:0; display:block; }
+  .logo-text{ display:flex; flex-direction:column; line-height:1; }
+  .logo-block .wordmark{ font-size:23px; font-weight:900; font-style:italic; line-height:1; }
+  .logo-block .wordmark .wm-h{ color:var(--hibbai-ink); }
+  .logo-block .wordmark .wm-bang{ color:var(--hibbai-green); margin-left:1px; }
+  .logo-block .subtag{ font-size:10px; font-weight:600; color:var(--hibbai-ink); margin-top:3px; display:flex; align-items:center; gap:3px; }
+  .logo-block .subtag .smile{ color:#f79400; font-weight:900; }
+  .nav-actions{ display:flex; align-items:center; gap:26px; }
+  .nav-action{ display:flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:700; color:var(--hibbai-ink); cursor:pointer; text-decoration:none; }
+  .nav-action .ic{ font-size:19px; }
+  .cart-badge{ position:relative; }
+  .cart-count{
+    position:absolute; top:-8px; right:-10px; background:var(--hibbai-pill); color:#fff;
+    font-size:10px; font-weight:800; border-radius:50%; width:17px; height:17px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .cat-strip{ background:#FF7A54; padding: 10px 24px; display:flex; gap:26px; flex-wrap:wrap; font-size:13.5px; font-weight:700; color:#2E1A47; }
+  .cat-strip a{ color:#2E1A47; text-decoration:none; }
+  .cat-strip a:hover{ text-decoration:underline; }
+
+  .cart-wrap{
+    max-width:1200px; margin:0 auto; padding: 34px 24px 60px;
+    display:grid; grid-template-columns: 1fr 320px; gap:36px; align-items:start;
+  }
+  .cart-main h1{ font-size:26px; margin:0 0 16px; }
+
+  .empty-box{ border:1px solid var(--hibbai-border); border-radius:8px; display:flex; align-items:center; padding:34px 30px; gap:26px; }
+  .empty-box .bubble-wrap{ display:flex; align-items:center; gap:14px; }
+  .empty-bubble{ background:#FFD166; color:var(--hibbai-ink); font-weight:800; font-size:18px; padding:16px 20px; border-radius:16px 16px 16px 2px; max-width:260px; line-height:1.25; }
+  .empty-monkey{ font-size:64px; line-height:1; }
+  .divider-v{ width:1px; align-self:stretch; background:var(--hibbai-border); }
+  .signin-block{ flex:1; text-align:center; font-size:15px; }
+
+  .cart-items{ border:1px solid var(--hibbai-border); border-radius:8px; overflow:hidden; }
+  .cart-item{ display:flex; align-items:center; gap:16px; padding:18px 20px; border-bottom:1px solid var(--hibbai-border); }
+  .cart-item:last-child{ border-bottom:none; }
+  .cart-item-img{ width:56px; height:56px; border-radius:6px; background:#f1f3f2; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .cart-item-info{ flex:1; min-width:0; }
+  .cart-item-title{ font-size:14.5px; font-weight:600; margin-bottom:4px; }
+  .cart-item-price{ font-size:13px; color:var(--hibbai-muted); }
+  .qty-control{ display:flex; align-items:center; gap:10px; border:1px solid var(--hibbai-border); border-radius:20px; padding:4px 10px; }
+  .qty-control button{ background:none; border:none; font-size:15px; font-weight:800; cursor:pointer; width:20px; color:var(--hibbai-ink); }
+  .qty-control span{ font-size:14px; font-weight:700; min-width:14px; text-align:center; }
+  .cart-item-total{ font-size:14.5px; font-weight:700; width:70px; text-align:right; }
+  .remove-link{ font-size:12.5px; color:#b23a3a; font-weight:600; cursor:pointer; margin-left:14px; }
+
+  .missed-section{ margin-top:40px; }
+  .missed-section h1{ font-size:22px; margin:0 0 16px; }
+  .missed-box{ border:1px solid var(--hibbai-border); border-radius:8px; display:flex; align-items:center; gap:24px; padding:34px 30px; }
+  .womp-icon{ font-size:52px; }
+  .missed-box p{ margin:0; font-size:14.5px; color:#333; max-width:420px; }
+
+  .sidebar{ border:1px solid var(--hibbai-border); border-radius:8px; padding:20px; }
+  .checkout-btn{
+    width:100%; border:1px solid var(--hibbai-border); border-radius:6px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; margin-bottom:18px;
+    background:#eee; color:#8a8a8a;
+  }
+  .checkout-btn.ready{ background:var(--hibbai-pill); color:#fff; border-color:var(--hibbai-pill); cursor:pointer; }
+  .sidebar .line{ font-size:14px; margin-bottom:10px; }
+  .sidebar .subtotal{ font-size:15px; font-weight:800; padding-top:10px; border-top:1px solid var(--hibbai-border); margin-top:4px; }
+  .sidebar .ships{ font-size:13.5px; font-weight:700; margin-top:18px; }
+  .ships-detail{ margin-top:10px; font-size:12.5px; color:#333; background:#f4f6f5; border-radius:6px; padding:10px 12px; display:none; }
+  .ships-detail.open{ display:block; }
+
+  footer{ background:#f4f6f5; margin-top:20px; padding: 40px 24px 20px; }
+  .footer-grid{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); gap:30px; }
+  .footer-grid h4{ font-size:13px; margin:0 0 12px; }
+  .footer-grid ul{ list-style:none; margin:0; padding:0; }
+  .footer-grid li{ margin-bottom:8px; font-size:13px; }
+  .fine-print{ font-size:11.5px; color:var(--hibbai-muted); line-height:1.6; }
+  .footer-bottom{
+    max-width:1200px; margin: 26px auto 0; padding-top:18px; border-top:1px solid var(--hibbai-border);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:11.5px; color:var(--hibbai-muted);
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--hibbai-ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width:860px){
+    .cart-wrap{ grid-template-columns:1fr; }
+    .empty-box{ flex-direction:column; text-align:center; }
+    .divider-v{ display:none; }
+    .footer-grid{ grid-template-columns:repeat(2,1fr); }
+    .cart-item{ flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="main-nav">
+    <a class="logo-block" href="hibbai_shop.html">
+      <svg class="logo-mark" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#FF5A36"/>
+        <circle cx="11" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <circle cx="19" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <path d="M11 18.5C12.6 20.4 17.4 20.4 19 18.5" stroke="#1a1a1a" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="logo-text">
+        <div class="wordmark"><span class="wm-h">Hibbai</span><span class="wm-bang">!</span></div>
+        <div class="subtag">shop &middot; chat &middot; win</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-action" href="hibbai_forums.html"><span class="ic">💬</span>Forums</a>
+      <a class="nav-action" href="hibbai_account.html"><span class="ic">👤</span><span class="nav-action-account-label">Account</span></a>
+      <a class="nav-action cart-badge" href="hibbai_cart.html" onclick="location.reload(); return false;"><span class="ic">🛒</span><span class="cart-count" id="cartCount">0</span></a>
+    </div>
+  </div>
+
+  <div class="cat-strip">
+    <a href="hibbai_shop.html">All Deals</a>
+    <a href="hibbai_category_home-kitchen.html">Home &amp; Kitchen</a>
+    <a href="hibbai_category_electronics.html">Electronics</a>
+    <a href="hibbai_category_computers.html">Computers</a>
+    <a href="hibbai_category_tools-garden.html">Tools &amp; Garden</a>
+    <a href="hibbai_category_sports-outdoors.html">Sports &amp; Outdoors</a>
+    <a href="hibbai_category_shirt.html">Shirt</a>
+    <a href="hibbai_category_grocery-household.html">Grocery &amp; Household</a>
+    <a href="hibbai_category_clearance.html">Clearance</a>
+  </div>
+
+  <div class="cart-wrap">
+    <div class="cart-main">
+      <h1 id="cartTitle">Shopping Cart (0 items)</h1>
+      <div id="cartBody"></div>
+
+      <div class="missed-section">
+        <h1>Stuff You Missed (0 items)</h1>
+        <div class="missed-box">
+          <div class="womp-icon">🎉</div>
+          <p>When deals in your shopping cart become unavailable, this is where they live (or come to die).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <button class="checkout-btn" id="checkoutBtn" onclick="tryCheckout()">Proceed to checkout</button>
+      <div class="line" id="itemsLine">You've got 0 items in your cart.</div>
+      <div class="line subtotal" id="subtotalLine">Subtotal: $0.00</div>
+      <div class="ships">$6 Ships Your Entire Order <a href="#" onclick="toggleShips(); return false;">Learn more</a></div>
+      <div class="ships-detail" id="shipsDetail">A flat $6 shipping charge covers your entire order, no matter how many deals you add — it's applied once at checkout, not per item.</div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-grid">
+      <div><h4>Company Info</h4><ul><li><a href="#" onclick="toast('About Us — coming soon'); return false;">About Us</a></li><li><a href="#" onclick="toast('Careers — coming soon'); return false;">Careers</a></li><li><a href="#" onclick="toast('FAQ — coming soon'); return false;">FAQ</a></li><li><a href="#" onclick="toast('Feedback — coming soon'); return false;">Feedback</a></li></ul></div>
+      <div><h4>Customer Care</h4><ul><li><a href="#" onclick="toast('Customer Service — coming soon'); return false;">Customer Service</a></li><li><a href="#" onclick="toast(&quot;Hibbai's Return Policy — coming soon&quot;); return false;">Hibbai's Return Policy</a></li><li><a href="#" onclick="toast('Product Warranty — coming soon'); return false;">Product Warranty</a></li><li><a href="#" onclick="toast('Product Recall Notices — coming soon'); return false;">Product Recall Notices</a></li><li><a href="#" onclick="toast('Write Us — coming soon'); return false;">Write Us</a></li></ul></div>
+      <div><h4>Community</h4><ul><li><a href="#" onclick="toast('Facebook — coming soon'); return false;">Facebook</a></li><li><a href="#" onclick="toast('Twitter — coming soon'); return false;">Twitter</a></li><li><a href="hibbai_forums.html">Forums</a></li><li><a href="#" onclick="toast('Everything But Hibbai — coming soon'); return false;">Everything But Hibbai</a></li><li><a href="#" onclick="toast('Developer Portal — coming soon'); return false;">Developer Portal</a></li></ul></div>
+      <div><h4>Boring Stuff</h4><ul><li><a href="#" onclick="toast('Hibbai Affiliates — coming soon'); return false;">Hibbai Affiliates</a></li><li><a href="#" onclick="toast('Terms and Conditions — coming soon'); return false;">Terms and Conditions</a></li><li><a href="#" onclick="toast('Prop 65 — coming soon'); return false;">Prop 65</a></li><li><a href="#" onclick="toast('Privacy Policy — coming soon'); return false;">Privacy Policy</a></li><li><a href="#" onclick="toast('Vendor Resources — coming soon'); return false;">Vendor Resources</a></li></ul></div>
+      <div><h4>The Fine Print</h4><p class="fine-print">hibbai.com is operated by Hibbai, Inc.. Products on hibbai.com are sold by Hibbai, Inc.. Product narratives are for entertainment purposes and frequently employ <a href="#" onclick="toast('Literary point of view — coming soon'); return false;">literary point of view</a>; the narratives do not express Hibbai's editorial opinion. Aside from literary abuse, your use of this site also subjects you to Hibbai's <a href="#" onclick="toast('Terms of use — coming soon'); return false;">terms of use</a> and <a href="#" onclick="toast('Privacy policy — coming soon'); return false;">privacy policy</a>.</p></div>
+    </div>
+    <div class="footer-bottom">
+      <span>Hibbai logos, site design, &amp; content © Hibbai, Inc. 2004-2026. All Rights Reserved.</span>
+      <span><a href="#" onclick="toast('Your Ads Privacy Choices — coming soon'); return false;">Your Ads Privacy Choices</a> &nbsp;|&nbsp; <a href="#" onclick="toast('Privacy Settings — coming soon'); return false;">Privacy Settings</a></span>
+    </div>
+  </footer>
+
+  <script>
+    function safeGet(key, fallback){
+      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    function safeSet(key, val){
+      try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+      catch(e){ return false; }
+    }
+    const HibbaiAuth = {
+      getSession(){ return safeGet('hibbai_session', null); },
+      getAccounts(){ return safeGet('hibbai_accounts', []); },
+      findAccount(email){ return this.getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase()); },
+      getCurrentUser(){
+        const s = this.getSession();
+        if (!s) return null;
+        return this.findAccount(s.email) || { name: s.email.split('@')[0], email: s.email };
+      }
+    };
+    const HibbaiCart = {
+      getCart(){ return safeGet('hibbai_cart', []); },
+      saveCart(items){ safeSet('hibbai_cart', items); },
+      setQty(title, qty){
+        let cart = this.getCart();
+        const item = cart.find(i => i.title === title);
+        if (item) item.qty = qty;
+        cart = cart.filter(i => i.qty > 0);
+        this.saveCart(cart);
+        return cart;
+      },
+      removeItem(title){
+        const cart = this.getCart().filter(i => i.title !== title);
+        this.saveCart(cart);
+        return cart;
+      },
+      clear(){ this.saveCart([]); },
+      getCount(){ return this.getCart().reduce((n,i)=>n+i.qty, 0); },
+      getSubtotal(){ return this.getCart().reduce((s,i)=>s+i.price*i.qty, 0); }
+    };
+
+    let toastTimer;
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+    }
+
+    function toggleShips(){ document.getElementById('shipsDetail').classList.toggle('open'); }
+
+    function changeQty(title, delta){
+      const cart = HibbaiCart.getCart();
+      const item = cart.find(i => i.title === title);
+      if (!item) return;
+      HibbaiCart.setQty(title, item.qty + delta);
+      render();
+    }
+    function removeFromCart(title){
+      HibbaiCart.removeItem(title);
+      toast('Removed: ' + title);
+      render();
+    }
+
+    function tryCheckout(){
+      const cart = HibbaiCart.getCart();
+      if (cart.length === 0){
+        toast('Your cart is empty — add a deal first');
+        return;
+      }
+      const user = HibbaiAuth.getCurrentUser();
+      if (!user){
+        toast('Sign in to check out');
+        window.location.href = 'hibbai_account.html';
+        return;
+      }
+      toast('Order placed! Thanks, ' + user.name.split(' ')[0] + '.');
+      HibbaiCart.clear();
+      setTimeout(render, 900);
+    }
+
+    function render(){
+      const cart = HibbaiCart.getCart();
+      const count = HibbaiCart.getCount();
+      document.getElementById('cartCount').textContent = count;
+      document.getElementById('cartTitle').textContent = `Shopping Cart (${count} item${count===1?'':'s'})`;
+      document.getElementById('itemsLine').textContent = `You've got ${count} item${count===1?'':'s'} in your cart.`;
+      document.getElementById('subtotalLine').textContent = 'Subtotal: $' + HibbaiCart.getSubtotal().toFixed(2);
+
+      const user = HibbaiAuth.getCurrentUser();
+      const label = document.querySelector('.nav-action-account-label');
+      if (label) label.textContent = user ? 'Hi, ' + user.name.split(' ')[0] : 'Account';
+
+      const btn = document.getElementById('checkoutBtn');
+      btn.classList.toggle('ready', cart.length > 0);
+
+      const body = document.getElementById('cartBody');
+      if (cart.length === 0){
+        body.innerHTML = `
+          <div class="empty-box">
+            <div class="bubble-wrap">
+              <div class="empty-bubble">Hello? It's getting lonely in here…</div>
+              <div class="empty-monkey">🐵</div>
+            </div>
+            <div class="divider-v"></div>
+            <div class="signin-block">
+              <a href="hibbai_account.html">Sign in</a> or <a href="hibbai_account.html">Sign up for an account</a>
+            </div>
+          </div>`;
+        return;
+      }
+
+      body.innerHTML = '<div class="cart-items">' + cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-img">📦</div>
+          <div class="cart-item-info">
+            <div class="cart-item-title">${item.title}</div>
+            <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+          </div>
+          <div class="qty-control">
+            <button onclick="changeQty('${item.title.replace(/'/g, "\\'")}', -1)">–</button>
+            <span>${item.qty}</span>
+            <button onclick="changeQty('${item.title.replace(/'/g, "\\'")}', 1)">+</button>
+          </div>
+          <div class="cart-item-total">$${(item.price*item.qty).toFixed(2)}</div>
+          <span class="remove-link" onclick="removeFromCart('${item.title.replace(/'/g, "\\'")}')">Remove</span>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    document.addEventListener('DOMContentLoaded', render);
+  </script>
+
+</body>
+</html>

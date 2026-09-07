@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home & Kitchen - Hibbai!</title>
+<style>
+  :root{
+    --hibbai-green:#FF5A36;
+    --hibbai-green-dark:#E14F3D;
+    --hibbai-ink:#1a1a1a;
+    --hibbai-pill:#3A1440;
+    --hibbai-muted:#6b7a72;
+    --hibbai-border:#d8ded9;
+    --hibbai-shop-teal:#2E1A47;
+    --hibbai-shop-cyan:#FFD166;
+    --hibbai-orange:#c9611c;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:"Helvetica Neue", Arial, sans-serif; color:var(--hibbai-ink); background:#fff;
+  }
+  a{ color:inherit; text-decoration:none; }
+  img{ max-width:100%; display:block; }
+
+  /* prime bar */
+  .prime-bar{
+    background:#2E1A47; color:#fff; text-align:center; font-size:12.5px;
+    padding:7px 12px;
+  }
+  .prime-bar a{ text-decoration:underline; font-weight:600; }
+  .prime-bar .prime-badge{
+    background:#FFD166; color:#2E1A47; font-weight:800; font-size:11px; font-style:italic;
+    padding:2px 6px; border-radius:3px; margin-right:8px;
+  }
+
+  /* main nav */
+  .main-nav{
+    background: var(--hibbai-green);
+    padding: 14px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .logo-block{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    background:#fff; border-radius:8px; padding:7px 14px 7px 10px; line-height:1;
+  }
+  .logo-mark{ flex-shrink:0; display:block; }
+  .logo-text{ display:flex; flex-direction:column; line-height:1; }
+  .logo-block .wordmark{
+    font-size:23px; font-weight:900; font-style:italic; letter-spacing:0.3px;
+    line-height:1;
+  }
+  .logo-block .wordmark .wm-h{ color:var(--hibbai-ink); }
+  .logo-block .wordmark .wm-bang{ color:var(--hibbai-green); margin-left:1px; }
+  .logo-block .subtag{
+    font-size:10px; font-weight:600; color:var(--hibbai-ink); letter-spacing:0.01em; margin-top:3px;
+    display:flex; align-items:center; gap:3px;
+  }
+  .logo-block .subtag .smile{ color:#f79400; font-weight:900; }
+
+  .nav-actions{ display:flex; align-items:center; gap:26px; }
+  .nav-action{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    font-size:12px; font-weight:700; color:var(--hibbai-ink); cursor:pointer;
+  }
+  .nav-action .ic{ font-size:19px; }
+  .cart-badge{
+    position:relative;
+  }
+  .cart-badge .count{
+    position:absolute; top:-6px; right:-10px; background:var(--hibbai-pill); color:#fff;
+    font-size:10px; font-weight:800; border-radius:50%; width:16px; height:16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* category strip */
+  .cat-strip{
+    background:#FF7A54;
+    padding: 10px 24px;
+    display:flex; gap:26px; flex-wrap:wrap;
+    font-size:13.5px; font-weight:700; color:#2E1A47;
+  }
+  .cat-strip span{ cursor:pointer; }
+  .cat-strip span:hover{ text-decoration:underline; }
+
+  /* hero */
+  .hero{
+    background: linear-gradient(135deg, var(--hibbai-shop-teal), #1A0F2E);
+    position:relative;
+    padding: 60px 24px;
+    display:flex; align-items:center; justify-content:center;
+    min-height: 280px;
+    overflow:hidden;
+  }
+  .hero-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:38px; height:38px; background:#dcdcdc; opacity:0.85;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px; cursor:pointer; color:#333;
+  }
+  .hero-arrow.left{ left:20px; }
+  .hero-arrow.right{ right:20px; }
+  .hero-content{ text-align:center; position:relative; }
+  .hero-flag{
+    display:inline-block; font-size:14px; font-weight:800; font-style:italic; color:#f2b23c;
+    transform: rotate(-6deg); margin-bottom:-6px;
+  }
+  .hero-title{
+    font-size:76px; font-weight:900; font-style:italic; color:var(--hibbai-shop-cyan);
+    letter-spacing:1px; line-height:0.95; margin:6px 0 20px;
+  }
+  .hero-btn{
+    background:var(--hibbai-shop-cyan); color:#06232e; border:none; border-radius:4px;
+    padding:12px 26px; font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .hero-dots{
+    position:absolute; bottom:-38px; left:50%; transform:translateX(-50%);
+    display:flex; gap:8px;
+  }
+  .hero-dots .dot{ width:7px; height:7px; border-radius:50%; background:#c7c7c7; }
+  .hero-dots .dot.active{ background:#666; }
+
+  .container{ max-width:1200px; margin:0 auto; padding: 0 24px; }
+
+  .sale-strip{
+    background:#dff5e6; margin: 0 24px; border-radius:6px; padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    margin-top:20px;
+  }
+  .sale-price{ font-size:26px; font-weight:900; }
+  .sale-price sup{ font-size:14px; }
+  .sale-info{ flex:1; min-width:220px; }
+  .sale-info h3{ margin:2px 0 4px; font-size:17px; }
+  .sale-info .rating{ font-size:12px; color:var(--hibbai-muted); }
+  .sale-info .timeleft{ font-size:12.5px; color:#a33; font-weight:600; }
+  .sale-coupon{ font-size:12.5px; color:#333; max-width:420px; }
+  .sale-btn{
+    background:var(--hibbai-pill); color:#fff; border:none; border-radius:20px;
+    padding:10px 22px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap;
+  }
+
+  section.shelf{ padding: 40px 24px 8px; max-width:1200px; margin:0 auto; }
+  .shelf-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; }
+  .shelf-head h2{ margin:0; font-size:24px; }
+  .shelf-head p{ margin:2px 0 0; color:var(--hibbai-muted); font-size:13.5px; }
+  .shelf-head a{ font-size:13.5px; font-weight:700; color:var(--hibbai-green-dark); }
+  .shelf-head a:hover{ text-decoration:underline; }
+
+  .shelf-grid{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:18px;
+  }
+  .shelf-row-scroll{
+    display:grid; grid-auto-flow:column; grid-auto-columns:minmax(190px,1fr);
+    gap:18px; overflow-x:auto; padding-bottom:6px;
+  }
+  .card{
+    border:1px solid var(--hibbai-border); border-radius:8px; overflow:hidden;
+    display:flex; flex-direction:column; background:#fff;
+  }
+  .card-img{
+    height:150px; display:flex; align-items:center; justify-content:center;
+    font-size:40px; background:#f1f3f2;
+  }
+  .card-body{ padding:12px 14px 16px; flex:1; display:flex; flex-direction:column; gap:4px; }
+  .card-price{ font-size:19px; font-weight:800; }
+  .card-price sup{ font-size:11px; }
+  .card-price .ref{ font-weight:400; font-size:12px; color:var(--hibbai-muted); text-decoration:line-through; margin-left:6px;}
+  .card-title{ font-size:13.5px; line-height:1.35; color:var(--hibbai-ink); }
+  .card-badge{ font-size:11.5px; color:#a33; font-weight:600; margin-top:2px; }
+
+  .poll-section{ padding:44px 24px 10px; max-width:1200px; margin:0 auto; }
+  .poll-section h2{ margin:0 0 2px; font-size:22px; }
+  .poll-section > p{ margin:0 0 22px; color:var(--hibbai-muted); font-size:13.5px; }
+  .poll-box{ max-width:480px; }
+  .poll-box .kicker{ color:var(--hibbai-green-dark); font-weight:700; font-size:13px; margin-bottom:6px; }
+  .poll-box h3{ margin:0 0 12px; font-size:16px; }
+  .poll-option{ display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:10px; }
+  .poll-option input{ width:16px; height:16px; }
+  .poll-actions{ display:flex; align-items:center; gap:14px; margin-top:14px; }
+  .vote-btn{ background:var(--hibbai-green); border:none; border-radius:4px; padding:9px 20px; font-weight:700; font-size:14px; cursor:pointer; }
+  .discuss-link{ font-size:14px; font-weight:700; color:var(--hibbai-ink); border:1px solid var(--hibbai-border); border-radius:4px; padding:9px 16px; display:flex; align-items:center; gap:6px; }
+  .discuss-count{ background:#e35a1c; color:#fff; font-size:11px; font-weight:800; padding:1px 6px; border-radius:10px; }
+
+  footer{ background:#f4f6f5; margin-top:50px; padding: 40px 24px 20px; }
+  .footer-grid{
+    max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); gap:30px;
+  }
+  .footer-grid h4{ font-size:13px; margin:0 0 12px; }
+  .footer-grid ul{ list-style:none; margin:0; padding:0; }
+  .footer-grid li{ margin-bottom:8px; font-size:13px; }
+  .footer-grid li a:hover{ text-decoration:underline; }
+  .fine-print{ font-size:11.5px; color:var(--hibbai-muted); line-height:1.6; }
+  .fine-print a{ text-decoration:underline; }
+  .footer-bottom{
+    max-width:1200px; margin: 26px auto 0; padding-top:18px; border-top:1px solid var(--hibbai-border);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-size:11.5px; color:var(--hibbai-muted);
+  }
+
+  .cat-strip span.active{ text-decoration:underline; }
+  .card{ position:relative; }
+  .add-btn{
+    margin-top:6px; align-self:flex-start;
+    background:var(--hibbai-pill); color:#fff; border:none; border-radius:14px;
+    padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .add-btn:active{ transform:scale(0.96); }
+  .cart-badge{ position:relative; }
+  .cart-count{
+    position:absolute; top:-8px; right:-10px; background:var(--hibbai-pill); color:#fff;
+    font-size:10px; font-weight:800; border-radius:50%; width:17px; height:17px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--hibbai-ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .poll-result{ margin-bottom:10px; }
+  .poll-result-row{ display:flex; align-items:center; gap:8px; font-size:13.5px; margin-bottom:6px; }
+  .poll-bar-track{ flex:1; height:10px; background:#eee; border-radius:6px; overflow:hidden; }
+  .poll-bar-fill{ height:100%; background:var(--hibbai-green); }
+
+  @media (max-width: 900px){
+    .shelf-grid{ grid-template-columns:repeat(2,1fr); }
+    .footer-grid{ grid-template-columns:repeat(2,1fr); }
+    .hero-title{ font-size:48px; }
+    .cat-strip{ overflow-x:auto; flex-wrap:nowrap; }
+  }
+
+  .cat-strip a.active{ text-decoration:underline; font-weight:800; }
+  .cat-hero{
+    padding: 46px 24px; text-align:center; color:#fff;
+  }
+  .cat-hero h1{ margin:0 0 8px; font-size:34px; font-style:italic; font-weight:900; }
+  .cat-hero p{ margin:0; font-size:14.5px; opacity:0.9; }
+</style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="prime-bar">
+    <span class="prime-badge">HIBBAI+</span> Free shipping over $35, every day. <a href="#" onclick="toast('Hibbai+ shipping details coming soon'); return false;">Learn more</a>
+  </div>
+
+  <div class="main-nav">
+    <a class="logo-block" href="hibbai_shop.html">
+      <svg class="logo-mark" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#FF5A36"/>
+        <circle cx="11" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <circle cx="19" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <path d="M11 18.5C12.6 20.4 17.4 20.4 19 18.5" stroke="#1a1a1a" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="logo-text">
+        <div class="wordmark"><span class="wm-h">Hibbai</span><span class="wm-bang">!</span></div>
+        <div class="subtag">shop &middot; chat &middot; win</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-action" href="hibbai_forums.html"><span class="ic">💬</span>Forums</a>
+      <a class="nav-action" href="hibbai_account.html" id="accountLink"><span class="ic">👤</span><span class="nav-action-account-label">Account</span></a>
+      <a class="nav-action cart-badge" href="hibbai_cart.html"><span class="ic">🛒</span><span class="cart-count" id="cartCount">0</span></a>
+    </div>
+  </div>
+
+  <div class="cat-strip" id="catStrip">
+    <a href="hibbai_shop.html">All Deals</a>
+    <a href="hibbai_category_home-kitchen.html" class="active">Home & Kitchen</a>
+    <a href="hibbai_category_electronics.html">Electronics</a>
+    <a href="hibbai_category_computers.html">Computers</a>
+    <a href="hibbai_category_tools-garden.html">Tools & Garden</a>
+    <a href="hibbai_category_sports-outdoors.html">Sports & Outdoors</a>
+    <a href="hibbai_category_shirt.html">Shirt</a>
+    <a href="hibbai_category_grocery-household.html">Grocery & Household</a>
+    <a href="hibbai_category_clearance.html">Clearance</a>
+  </div>
+
+  <div class="cat-hero" style="background:#2E1A47;">
+    <h1>Home & Kitchen</h1>
+    <p>Stock the kitchen and tidy the house for less.</p>
+  </div>
+
+  <section class="shelf" style="padding-top:34px;">
+    <div class="shelf-grid">
+      <div class="card"><div class="card-img">🧺</div><div class="card-body"><div class="card-price">$6<sup>99</sup>&ndash;$149<sup>99</sup></div><div class="card-title">Kitchen &amp; Home Storage Essentials<button class="add-btn" onclick="addToCart(this, 6.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🍳</div><div class="card-body"><div class="card-price">$17<sup>99</sup>&ndash;$189<sup>99</sup></div><div class="card-title">Upgrade Your Kitchen Game! Ninja, Cuisinart, Keurig and More<button class="add-btn" onclick="addToCart(this, 17.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🧽</div><div class="card-body"><div class="card-price">$12<sup>99</sup><span class="ref">$59.99</span></div><div class="card-title">Cuisinart Steam Cleaner Grill Brush<button class="add-btn" onclick="addToCart(this, 12.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🪟</div><div class="card-body"><div class="card-price">$14<sup>99</sup><span class="ref">$28.53</span></div><div class="card-title">BAYKA 4pc Wood Floating Bathroom Shelves<button class="add-btn" onclick="addToCart(this, 14.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🗄️</div><div class="card-body"><div class="card-price">$19<sup>99</sup></div><div class="card-title">NUTIKAS Desktop Shelf Organizer<button class="add-btn" onclick="addToCart(this, 19.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🗄️</div><div class="card-body"><div class="card-price">$24<sup>99</sup></div><div class="card-title">Amazon Basics 3-Tier Metal Rolling Cart<button class="add-btn" onclick="addToCart(this, 24.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🚿</div><div class="card-body"><div class="card-price">$24<sup>99</sup><span class="ref">$39.99</span></div><div class="card-title">HAMITOR 4-Tier Shower Caddy Tension Pole<button class="add-btn" onclick="addToCart(this, 24.99)">Add to Cart</button></div></div></div>
+      <div class="card"><div class="card-img">🧦</div><div class="card-body"><div class="card-price">$7<sup>99</sup><span class="ref">$12.99</span></div><div class="card-title">Amazon Basics 10 Spray Patterns Garden Hose Nozzle<button class="add-btn" onclick="addToCart(this, 7.99)">Add to Cart</button></div></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <h4>Company Info</h4>
+        <ul>
+          <li><a href="#" onclick="toast('About Us — coming soon'); return false;">About Us</a></li>
+          <li><a href="#" onclick="toast('Careers — coming soon'); return false;">Careers</a></li>
+          <li><a href="#" onclick="toast('FAQ — coming soon'); return false;">FAQ</a></li>
+          <li><a href="#" onclick="toast('Feedback — coming soon'); return false;">Feedback</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Customer Care</h4>
+        <ul>
+          <li><a href="#" onclick="toast('Customer Service — coming soon'); return false;">Customer Service</a></li>
+          <li><a href="#" onclick="toast('Hibbai's Return Policy — coming soon'); return false;">Hibbai's Return Policy</a></li>
+          <li><a href="#" onclick="toast('Product Warranty — coming soon'); return false;">Product Warranty</a></li>
+          <li><a href="#" onclick="toast('Product Recall Notices — coming soon'); return false;">Product Recall Notices</a></li>
+          <li><a href="#" onclick="toast('Write Us — coming soon'); return false;">Write Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Community</h4>
+        <ul>
+          <li><a href="#" onclick="toast('Facebook — coming soon'); return false;">Facebook</a></li>
+          <li><a href="#" onclick="toast('Twitter — coming soon'); return false;">Twitter</a></li>
+          <li><a href="hibbai_forums.html">Forums</a></li>
+          <li><a href="#" onclick="toast('Everything But Hibbai — coming soon'); return false;">Everything But Hibbai</a></li>
+          <li><a href="#" onclick="toast('Developer Portal — coming soon'); return false;">Developer Portal</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Boring Stuff</h4>
+        <ul>
+          <li><a href="#" onclick="toast('Hibbai Affiliates — coming soon'); return false;">Hibbai Affiliates</a></li>
+          <li><a href="#" onclick="toast('Terms and Conditions — coming soon'); return false;">Terms and Conditions</a></li>
+          <li><a href="#" onclick="toast('Prop 65 — coming soon'); return false;">Prop 65</a></li>
+          <li><a href="#" onclick="toast('Privacy Policy — coming soon'); return false;">Privacy Policy</a></li>
+          <li><a href="#" onclick="toast('Vendor Resources — coming soon'); return false;">Vendor Resources</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>The Fine Print</h4>
+        <p class="fine-print">
+          hibbai.com is operated by Hibbai, Inc.. Products on hibbai.com are sold by Hibbai, Inc.. Product narratives are for entertainment purposes and frequently employ <a href="#" onclick="toast('literary point of view — coming soon'); return false;">literary point of view</a>; the narratives do not express Hibbai's editorial opinion. Aside from literary abuse, your use of this site also subjects you to Hibbai's <a href="#" onclick="toast('terms of use — coming soon'); return false;">terms of use</a> and <a href="#" onclick="toast('privacy policy — coming soon'); return false;">privacy policy</a>.
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>Hibbai logos, site design, &amp; content © Hibbai, Inc. 2004-2026. All Rights Reserved.</span>
+      <span><a href="#" onclick="toast('Your Ads Privacy Choices — coming soon'); return false;">Your Ads Privacy Choices</a> &nbsp;|&nbsp; <a href="#" onclick="toast('Privacy Settings — coming soon'); return false;">Privacy Settings</a></span>
+    </div>
+  </footer>
+
+  <script>
+  // ---- shared account + cart storage ----
+  function safeGet(key, fallback){
+    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function safeSet(key, val){
+    try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+    catch(e){ return false; }
+  }
+  const HibbaiAuth = {
+    getAccounts(){ return safeGet('hibbai_accounts', []); },
+    saveAccounts(list){ safeSet('hibbai_accounts', list); },
+    findAccount(email){ return this.getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase()); },
+    createAccount(name, email, password){
+      const accounts = this.getAccounts();
+      accounts.push({ name, email, password });
+      this.saveAccounts(accounts);
+      this.setSession(email);
+    },
+    setSession(email){ safeSet('hibbai_session', { email }); },
+    getSession(){ return safeGet('hibbai_session', null); },
+    clearSession(){ try { localStorage.removeItem('hibbai_session'); } catch(e){} },
+    getCurrentUser(){
+      const s = this.getSession();
+      if (!s) return null;
+      return this.findAccount(s.email) || { name: s.email.split('@')[0], email: s.email };
+    }
+  };
+  const HibbaiCart = {
+    getCart(){ return safeGet('hibbai_cart', []); },
+    saveCart(items){ safeSet('hibbai_cart', items); },
+    addItem(title, price){
+      const cart = this.getCart();
+      const existing = cart.find(i => i.title === title);
+      if (existing) existing.qty += 1; else cart.push({ title, price, qty: 1 });
+      this.saveCart(cart);
+      return cart;
+    },
+    getCount(){ return this.getCart().reduce((n,i)=>n+i.qty, 0); }
+  };
+  function renderAuthHeader(){
+    const label = document.querySelector('.nav-action-account-label');
+    const user = HibbaiAuth.getCurrentUser();
+    if (label) label.textContent = user ? 'Hi, ' + user.name.split(' ')[0] : 'Account';
+    const cartCountEl = document.getElementById('cartCount');
+    if (cartCountEl) cartCountEl.textContent = HibbaiCart.getCount();
+  }
+  document.addEventListener('DOMContentLoaded', renderAuthHeader);
+
+  // ---- toast ----
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+  }
+
+  // ---- cart ----
+  function addToCart(btn, price){
+    const title = btn.closest('.card').querySelector('.card-title').textContent.trim();
+    HibbaiCart.addItem(title, price);
+    document.getElementById('cartCount').textContent = HibbaiCart.getCount();
+    toast('Added to cart: ' + title);
+  }
+</script>
+
+
+</body>
+</html>

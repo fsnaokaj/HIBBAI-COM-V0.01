@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hibbai! Brand Assets</title>
+<style>
+  :root{
+    --coral:#FF5A36;
+    --coral-dark:#E14F3D;
+    --ink:#1a1a1a;
+    --plum:#3A1440;
+    --muted:#6b7a72;
+    --border:#e2e2e2;
+    --champagne:#F7E7CE;
+    --champagne-dark:#D9BE8F;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:"Helvetica Neue", Arial, sans-serif; color:var(--ink); background:#fafafa; }
+  a{ color:inherit; }
+
+  /* top app bar */
+  .appbar{
+    background:var(--ink); color:#fff; padding:14px 24px;
+    display:flex; align-items:center; gap:18px;
+  }
+  .appbar .menu-ic{ font-size:18px; cursor:pointer; }
+  .appbar .brand{ font-weight:900; font-style:italic; font-size:18px; display:flex; align-items:center; gap:8px; }
+  .appbar .brand .bang{ color:var(--coral); }
+  .appbar-search{ flex:1; max-width:560px; margin:0 auto; position:relative; }
+  .appbar-search input{
+    width:100%; padding:9px 14px 9px 36px; border-radius:6px; border:none; font-size:14px;
+  }
+  .appbar-search .ic{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#888; font-size:14px; }
+  .appbar-right{ font-size:13px; color:#ccc; }
+
+  .container{ max-width:1280px; margin:0 auto; padding: 24px 24px 80px; }
+
+  h1.page-title{ font-size:22px; margin:0 0 4px; }
+  .page-sub{ color:var(--muted); font-size:13.5px; margin:0 0 22px; }
+
+  /* filter bar */
+  .filter-bar{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:18px;
+    padding-bottom:16px; border-bottom:1px solid var(--border);
+  }
+  .filter-group{ display:flex; align-items:center; gap:6px; }
+  .filter-label{ font-size:12px; font-weight:700; color:var(--muted); margin-right:2px; }
+  .chip{
+    border:1px solid var(--border); background:#fff; border-radius:16px; padding:6px 14px;
+    font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink);
+  }
+  .chip.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .spacer{ flex:1; }
+  .sort-select{
+    border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:12.5px; font-weight:600;
+    background:#fff; cursor:pointer;
+  }
+  .result-count{ font-size:12.5px; color:var(--muted); margin-bottom:14px; }
+
+  /* asset grid */
+  .asset-grid{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:18px; margin-bottom:50px;
+  }
+  .asset-card{
+    border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff;
+    display:flex; flex-direction:column;
+  }
+  .asset-stage{
+    height:150px; display:flex; align-items:center; justify-content:center; gap:10px; position:relative;
+  }
+  .asset-stage.bg-light{ background:#fff; }
+  .asset-stage.bg-dark{ background:#1a1a1a; }
+  .asset-stage.bg-coral{ background:var(--coral); }
+  .asset-meta{ padding:12px 14px 14px; border-top:1px solid var(--border); }
+  .asset-name{ font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .asset-sub{ font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .dl-btn{
+    width:100%; background:#f0f0ee; border:1px solid var(--border); border-radius:6px;
+    padding:7px; font-size:12px; font-weight:700; cursor:pointer; color:var(--ink);
+  }
+  .dl-btn:hover{ background:var(--coral); color:#fff; border-color:var(--coral); }
+  .no-results{ padding:50px 0; text-align:center; color:var(--muted); font-size:14px; }
+
+  /* preview svgs share sizing */
+  .asset-stage svg{ display:block; }
+
+  /* sections */
+  section.block{ margin: 46px 0; }
+  section.block h2{ font-size:16px; margin:0 0 4px; }
+  section.block .block-sub{ color:var(--muted); font-size:13px; margin:0 0 18px; }
+
+  .swatch-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:14px; }
+  .swatch{ border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff; }
+  .swatch-color{ height:80px; }
+  .swatch-meta{ padding:10px 12px; }
+  .swatch-meta .name{ font-weight:700; font-size:13px; display:block; }
+  .swatch-meta .hex{ color:var(--muted); font-family:monospace; font-size:12px; }
+  .swatch-copy{
+    margin-top:8px; width:100%; background:#f0f0ee; border:1px solid var(--border); border-radius:6px;
+    padding:5px; font-size:11.5px; font-weight:700; cursor:pointer;
+  }
+  .swatch-copy:hover{ background:var(--champagne); }
+
+  .type-row{ display:flex; align-items:baseline; gap:20px; padding:14px 0; border-bottom:1px solid var(--border); }
+  .type-row .label{ width:150px; flex-shrink:0; font-size:12px; color:var(--muted); font-weight:600; }
+  .type-sample-display{ font-size:40px; font-weight:900; font-style:italic; }
+  .type-sample-h1{ font-size:26px; font-weight:800; font-family:Georgia,serif; font-style:italic; }
+  .type-sample-h2{ font-size:19px; font-weight:700; }
+  .type-sample-body{ font-size:15px; }
+
+  .usage-note{ font-size:13.5px; color:#3a4a43; line-height:1.7; max-width:760px; }
+  .usage-note code{ background:#f0f0ee; padding:1px 6px; border-radius:4px; font-size:12.5px; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="appbar">
+  <span class="menu-ic">☰</span>
+  <div class="brand">HIBBAI<span class="bang">!</span></div>
+  <div class="appbar-search">
+    <span class="ic">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search assets…" oninput="render()">
+  </div>
+  <div class="appbar-right">Brand Assets</div>
+</div>
+
+<div class="container">
+  <h1 class="page-title">Hibbai! Brand Assets</h1>
+  <p class="page-sub">Logos, icons, and graphics for the Hibbai family — Hibbai Shop, Hibbai Forums, and Shirt.Hibbai. Search, filter, and download what you need.</p>
+
+  <div class="filter-bar">
+    <div class="filter-group">
+      <span class="filter-label">Type</span>
+      <button class="chip active" data-filter="type" data-value="all" onclick="setFilter('type','all')">All</button>
+      <button class="chip" data-filter="type" data-value="logo" onclick="setFilter('type','logo')">Logo</button>
+      <button class="chip" data-filter="type" data-value="icon" onclick="setFilter('type','icon')">Icon</button>
+      <button class="chip" data-filter="type" data-value="graphic" onclick="setFilter('type','graphic')">Graphic</button>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Background</span>
+      <button class="chip active" data-filter="bg" data-value="all" onclick="setFilter('bg','all')">All</button>
+      <button class="chip" data-filter="bg" data-value="light" onclick="setFilter('bg','light')">Light</button>
+      <button class="chip" data-filter="bg" data-value="dark" onclick="setFilter('bg','dark')">Dark</button>
+      <button class="chip" data-filter="bg" data-value="coral" onclick="setFilter('bg','coral')">Coral</button>
+    </div>
+    <div class="spacer"></div>
+    <select class="sort-select" id="sortSelect" onchange="render()">
+      <option value="name">Name (A–Z)</option>
+      <option value="newest">Newest added</option>
+    </select>
+  </div>
+
+  <div class="result-count" id="resultCount"></div>
+  <div class="asset-grid" id="assetGrid"></div>
+
+  <section class="block">
+    <h2>Colors</h2>
+    <p class="block-sub">Tap any swatch to copy its hex code.</p>
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FF5A36;"></div>
+        <div class="swatch-meta">
+          <span class="name">Hibbai Coral</span><span class="hex">#FF5A36 &middot; rgb(255,90,54)</span>
+          <button class="swatch-copy" onclick="copyHex('#FF5A36')">Copy HEX</button>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E14F3D;"></div>
+        <div class="swatch-meta">
+          <span class="name">Coral Dark</span><span class="hex">#E14F3D &middot; rgb(225,79,61)</span>
+          <button class="swatch-copy" onclick="copyHex('#E14F3D')">Copy HEX</button>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#3A1440;"></div>
+        <div class="swatch-meta">
+          <span class="name">Deep Plum</span><span class="hex">#3A1440 &middot; rgb(58,20,64)</span>
+          <button class="swatch-copy" onclick="copyHex('#3A1440')">Copy HEX</button>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1A1A1A;"></div>
+        <div class="swatch-meta">
+          <span class="name">Ink</span><span class="hex">#1A1A1A &middot; rgb(26,26,26)</span>
+          <button class="swatch-copy" onclick="copyHex('#1A1A1A')">Copy HEX</button>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFD166;"></div>
+        <div class="swatch-meta">
+          <span class="name">Debut Yellow</span><span class="hex">#FFD166 &middot; rgb(255,209,102)</span>
+          <button class="swatch-copy" onclick="copyHex('#FFD166')">Copy HEX</button>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F7E7CE;"></div>
+        <div class="swatch-meta">
+          <span class="name">Champagne</span><span class="hex">#F7E7CE &middot; rgb(247,231,206)</span>
+          <button class="swatch-copy" onclick="copyHex('#F7E7CE')">Copy HEX</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Typography</h2>
+    <p class="block-sub">The type scale used across shop, cart, and forums.</p>
+    <div class="type-row"><div class="label">Display / Logo</div><div class="type-sample-display">Hibbai!</div></div>
+    <div class="type-row"><div class="label">Editorial H1</div><div class="type-sample-h1">Welcome to our community!</div></div>
+    <div class="type-row"><div class="label">Section H2</div><div class="type-sample-h2">Daily Deals</div></div>
+    <div class="type-row"><div class="label">Body</div><div class="type-sample-body">Shop deals, chat in the forums, win the giveaway.</div></div>
+  </section>
+
+  <section class="block">
+    <h2>Usage notes</h2>
+    <p class="usage-note">
+      The wordmark is always set in the bold italic outlined <code>Hibbai!</code> treatment — never recolor the outline, and never pair it with a different exclamation mark style. The blob mascot sits to the left of the wordmark, never above, below, or replacing a letter — coral-filled on white/dark backgrounds, white-with-ink-outline on coral backgrounds, so it never disappears into its background. On the shop, the wordmark carries the <code>shop &middot; chat &middot; win</code> tagline; sub-products (Forums, Shirt.Hibbai) drop the tagline for their own plain-text sub-label instead.
+    </p>
+  </section>
+</div>
+
+<script>
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+  }
+
+  function copyHex(hex){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(hex).then(
+        () => toast('Copied ' + hex),
+        () => fallbackCopy(hex)
+      );
+    } else {
+      fallbackCopy(hex);
+    }
+  }
+  function fallbackCopy(text){
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('Copied ' + text);
+    } catch(e){
+      toast(text + ' — copy it manually');
+    }
+  }
+
+  // ---- asset SVG builders ----
+  function mascotSvg(fillMode){
+    // fillMode: 'coral' (fill coral, for light/dark bg) or 'outline' (white fill, ink outline, for coral bg)
+    const fill = fillMode === 'coral' ? '#FF5A36' : '#fff';
+    const stroke = fillMode === 'coral' ? 'none' : '#1a1a1a';
+    const strokeWidth = fillMode === 'coral' ? '0' : '1.6';
+    return `<svg width="72" height="72" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"/>
+      <circle cx="11" cy="13.5" r="1.9" fill="#1a1a1a"/>
+      <circle cx="19" cy="13.5" r="1.9" fill="#1a1a1a"/>
+      <path d="M11 18.5C12.6 20.6 17.4 20.6 19 18.5" stroke="#1a1a1a" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+    </svg>`;
+  }
+  function wordmarkHtml(mode){
+    // mode: 'ink' (ink text, coral bang) or 'white' (all white, for dark/coral bg)
+    if (mode === 'ink'){
+      return `<span style="font-size:30px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></span>`;
+    }
+    return `<span style="font-size:30px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span>`;
+  }
+  function lockupSvg(mascotFill, wordmarkColor, tagline){
+    const taglineRow = tagline ? `<div style="font-size:10px;font-weight:600;color:${wordmarkColor};margin-top:2px;">${tagline}</div>` : '';
+    return {
+      preview: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg(mascotFill)}<div><div style="font-size:26px;font-weight:900;font-style:italic;color:${wordmarkColor};">Hibbai${wordmarkColor==='#1a1a1a' ? '<span style=\"color:#FF5A36;\">!</span>' : '!'}</div>${taglineRow}</div></div>`,
+    };
+  }
+
+  function standaloneSvg(inner, w, h){
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+  }
+
+  function fullLockupSvgFile(mascotFill, textFill, bangFill, tagline){
+    const mascot = `<g transform="translate(6,9)">${mascotSvg(mascotFill).replace(/<svg[^>]*>|<\/svg>/g,'')}</g>`;
+    const text = `<text x="90" y="42" font-family="Helvetica, Arial, sans-serif" font-size="34" font-style="italic" font-weight="900" fill="${textFill}">Hibbai<tspan fill="${bangFill}">!</tspan></text>`;
+    const tag = tagline ? `<text x="92" y="58" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="${textFill}">${tagline}</text>` : '';
+    return `<svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">${mascot}${text}${tag}</svg>`;
+  }
+
+  const ASSETS = [
+    {
+      id: 'primary-lockup', name: 'Primary Lockup', type: 'logo', bg: 'coral', added: '2026-09-03',
+      previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('outline')}<span style="font-size:28px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span></div>`,
+      file: () => fullLockupSvgFile('#fff', '#fff', '#fff', null)
+    },
+    {
+      id: 'on-white-lockup', name: 'On White', type: 'logo', bg: 'light', added: '2026-09-03',
+      previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<span style="font-size:28px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></span></div>`,
+      file: () => fullLockupSvgFile('#FF5A36', '#1a1a1a', '#FF5A36', null)
+    },
+    {
+      id: 'reversed-lockup', name: 'Reversed', type: 'logo', bg: 'dark', added: '2026-09-02',
+      previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<span style="font-size:28px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span></div>`,
+      file: () => fullLockupSvgFile('#FF5A36', '#fff', '#fff', null)
+    },
+    {
+      id: 'shop-master-lockup', name: 'Shop Master Lockup', type: 'logo', bg: 'coral', added: '2026-09-01',
+      previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('outline')}<div><div style="font-size:24px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</div><div style="font-size:10px;font-weight:600;color:#fff;">shop &middot; chat &middot; win</div></div></div>`,
+      file: () => fullLockupSvgFile('#fff', '#fff', '#fff', 'shop &#183; chat &#183; win')
+    },
+    {
+      id: 'forums-sublockup', name: 'Forums Sub-Brand', type: 'logo', bg: 'light', added: '2026-09-01',
+      previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<div><div style="font-size:24px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></div><div style="font-size:10px;font-weight:600;color:#6b7a72;">forums</div></div></div>`,
+      file: () => fullLockupSvgFile('#FF5A36', '#1a1a1a', '#FF5A36', 'forums')
+    },
+    {
+      id: 'wordmark-only-light', name: 'Wordmark Only (Ink)', type: 'logo', bg: 'light', added: '2026-08-30',
+      previewHtml: `<span style="font-size:32px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></span>`,
+      file: () => `<svg width="240" height="60" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg"><text x="4" y="42" font-family="Helvetica, Arial, sans-serif" font-size="34" font-style="italic" font-weight="900" fill="#1a1a1a">Hibbai<tspan fill="#FF5A36">!</tspan></text></svg>`
+    },
+    {
+      id: 'wordmark-only-dark', name: 'Wordmark Only (White)', type: 'logo', bg: 'dark', added: '2026-08-30',
+      previewHtml: `<span style="font-size:32px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span>`,
+      file: () => `<svg width="240" height="60" viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg"><text x="4" y="42" font-family="Helvetica, Arial, sans-serif" font-size="34" font-style="italic" font-weight="900" fill="#fff">Hibbai!</text></svg>`
+    },
+    {
+      id: 'mascot-fill', name: 'Mascot — Fill', type: 'icon', bg: 'light', added: '2026-08-28',
+      previewHtml: mascotSvg('coral'),
+      file: () => mascotSvg('coral').replace('width="72" height="72"', 'width="120" height="120"')
+    },
+    {
+      id: 'mascot-outline', name: 'Mascot — Outline', type: 'icon', bg: 'coral', added: '2026-08-28',
+      previewHtml: mascotSvg('outline'),
+      file: () => mascotSvg('outline').replace('width="72" height="72"', 'width="120" height="120"')
+    },
+    {
+      id: 'icon-deal-chatter', name: 'Icon — Deal Chatter', type: 'icon', bg: 'light', added: '2026-08-20',
+      previewHtml: `<div style="width:56px;height:56px;border-radius:50%;background:#dff5e6;display:flex;align-items:center;justify-content:center;font-size:26px;">🎉</div>`,
+      file: () => `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#dff5e6"/><text x="40" y="52" font-size="34" text-anchor="middle">&#127881;</text></svg>`
+    },
+    {
+      id: 'icon-shenanigans', name: 'Icon — Shenanigans', type: 'icon', bg: 'light', added: '2026-08-20',
+      previewHtml: `<div style="width:56px;height:56px;border-radius:50%;background:#fbf0cf;display:flex;align-items:center;justify-content:center;font-size:26px;">🎭</div>`,
+      file: () => `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#fbf0cf"/><text x="40" y="52" font-size="34" text-anchor="middle">&#127917;</text></svg>`
+    },
+    {
+      id: 'icon-info-desk', name: 'Icon — Information Desk', type: 'icon', bg: 'light', added: '2026-08-20',
+      previewHtml: `<div style="width:56px;height:56px;border-radius:50%;background:#d9f0f5;display:flex;align-items:center;justify-content:center;font-size:26px;">📢</div>`,
+      file: () => `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#d9f0f5"/><text x="40" y="52" font-size="34" text-anchor="middle">&#128226;</text></svg>`
+    },
+    {
+      id: 'graphic-chat-bubbles', name: 'Chat Bubble Sticker Sheet', type: 'graphic', bg: 'light', added: '2026-08-15',
+      previewHtml: `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+        <span style="background:#8a1c47;color:#fff;font-weight:800;font-size:10px;padding:4px 8px;border-radius:4px;transform:rotate(-4deg);">OMG</span>
+        <span style="background:#e9a7d6;color:#1a1a1a;font-weight:800;font-size:10px;padding:6px;border-radius:50%;">LOL</span>
+        <span style="background:#FFD166;color:#1a1a1a;font-weight:800;font-size:10px;padding:4px 8px;border-radius:4px;transform:rotate(4deg);">WTF?!</span>
+      </div>`,
+      file: () => `<svg width="300" height="140" viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="20" width="70" height="34" rx="8" fill="#8a1c47" transform="rotate(-4 45 37)"/>
+        <text x="45" y="42" font-family="Helvetica" font-size="14" font-weight="800" fill="#fff" text-anchor="middle" transform="rotate(-4 45 37)">OMG</text>
+        <circle cx="150" cy="50" r="32" fill="#e9a7d6"/>
+        <text x="150" y="56" font-family="Helvetica" font-size="14" font-weight="800" fill="#1a1a1a" text-anchor="middle">LOL</text>
+        <rect x="210" y="20" width="80" height="34" rx="8" fill="#FFD166" transform="rotate(4 250 37)"/>
+        <text x="250" y="42" font-family="Helvetica" font-size="14" font-weight="800" fill="#1a1a1a" text-anchor="middle" transform="rotate(4 250 37)">WTF?!</text>
+      </svg>`
+    },
+    {
+      id: 'graphic-banner', name: 'Coral Banner Graphic', type: 'graphic', bg: 'coral', added: '2026-08-10',
+      previewHtml: `<div style="display:flex;align-items:center;gap:8px;">${mascotSvg('outline')}<span style="font-size:20px;font-weight:900;font-style:italic;color:#fff;">Welcome!</span></div>`,
+      file: () => `<svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg">
+        <rect width="400" height="140" fill="#FF5A36"/>
+        <g transform="translate(24,34)">${mascotSvg('outline').replace(/<svg[^>]*>|<\/svg>/g,'')}</g>
+        <text x="110" y="80" font-family="Helvetica" font-size="30" font-style="italic" font-weight="900" fill="#fff">Welcome to our community!</text>
+      </svg>`
+    }
+  ];
+
+  let filters = { type: 'all', bg: 'all' };
+  function setFilter(kind, value){
+    filters[kind] = value;
+    document.querySelectorAll(`.chip[data-filter="${kind}"]`).forEach(c => c.classList.toggle('active', c.dataset.value === value));
+    render();
+  }
+
+  function slugify(name){ return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+  function downloadAsset(id){
+    const asset = ASSETS.find(a => a.id === id);
+    if (!asset) return;
+    try {
+      const svgText = asset.file();
+      const blob = new Blob([svgText], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = slugify(asset.name) + '.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(()=> URL.revokeObjectURL(url), 1000);
+      toast('Downloaded ' + asset.name + '.svg');
+    } catch(e){
+      toast('Download blocked by this preview — open the page in a full browser tab to download.');
+    }
+  }
+
+  function render(){
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const sort = document.getElementById('sortSelect').value;
+
+    let list = ASSETS.filter(a => {
+      if (filters.type !== 'all' && a.type !== filters.type) return false;
+      if (filters.bg !== 'all' && a.bg !== filters.bg) return false;
+      if (q && !a.name.toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    if (sort === 'name') list.sort((x,y) => x.name.localeCompare(y.name));
+    else list.sort((x,y) => new Date(y.added) - new Date(x.added));
+
+    document.getElementById('resultCount').textContent = `${list.length} asset${list.length===1?'':'s'}`;
+
+    const grid = document.getElementById('assetGrid');
+    if (list.length === 0){
+      grid.innerHTML = '';
+      grid.insertAdjacentHTML('afterend', '');
+      grid.innerHTML = `<div class="no-results" style="grid-column:1/-1;">No assets match your search.</div>`;
+      return;
+    }
+
+    grid.innerHTML = list.map(a => `
+      <div class="asset-card">
+        <div class="asset-stage bg-${a.bg}">${a.previewHtml}</div>
+        <div class="asset-meta">
+          <div class="asset-name">${a.name}</div>
+          <div class="asset-sub">SVG &middot; added ${new Date(a.added).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</div>
+          <button class="dl-btn" onclick="downloadAsset('${a.id}')">Download SVG</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', render);
+</script>
+
+</body>
+</html>

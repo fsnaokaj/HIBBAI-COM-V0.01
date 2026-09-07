@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hibbai!</title>
+<style>
+  :root{
+    --coral:#FF5A36;
+    --coral-dark:#E14F3D;
+    --ink:#1a1a1a;
+    --plum:#3A1440;
+    --plum-dark:#2E1A47;
+    --muted:#6b7a72;
+    --border:#d8ded9;
+    --yellow:#FFD166;
+    --champagne:#F7E7CE;
+    --champagne-dark:#D9BE8F;
+    --link:#B34700;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:"Helvetica Neue", Arial, sans-serif; color:var(--ink); background:#fff; }
+  a{ color:inherit; text-decoration:none; cursor:pointer; }
+  img{ max-width:100%; display:block; }
+  button{ font-family:inherit; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+
+  /* ===== shared header ===== */
+  .promo-bar{
+    background:var(--plum-dark); color:#fff; text-align:center; font-size:12.5px; padding:7px 12px;
+  }
+  .promo-bar .badge{
+    background:var(--yellow); color:var(--plum-dark); font-weight:800; font-size:11px; font-style:italic;
+    padding:2px 6px; border-radius:3px; margin-right:8px;
+  }
+  .promo-bar a{ text-decoration:underline; font-weight:600; }
+
+  .topnav{
+    background: var(--coral);
+    padding: 12px 24px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  .logo-block{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    background:#fff; border-radius:8px; padding:7px 14px 7px 10px; line-height:1; border:none;
+  }
+  .logo-mark{ flex-shrink:0; display:block; }
+  .logo-text{ display:flex; flex-direction:column; line-height:1; }
+  .logo-block .wordmark{ font-size:22px; font-weight:900; font-style:italic; line-height:1; }
+  .logo-block .wordmark .wm-h{ color:var(--ink); }
+  .logo-block .wordmark .wm-bang{ color:var(--coral); margin-left:1px; }
+  .logo-block .subtag{ font-size:10px; font-weight:600; color:var(--ink); margin-top:3px; }
+
+  .main-tabs{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .main-tab{
+    background:rgba(255,255,255,0.0); border:none; color:var(--ink); font-weight:700; font-size:14px;
+    padding:9px 14px; border-radius:8px; cursor:pointer;
+  }
+  .main-tab:hover{ background:rgba(255,255,255,0.35); }
+  .main-tab.active{ background:#fff; }
+
+  .nav-actions{ display:flex; align-items:center; gap:22px; }
+  .nav-item{ position:relative; }
+  .nav-action{
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    font-size:12px; font-weight:700; color:var(--ink); cursor:pointer; background:none; border:none;
+    padding:6px 4px; border-radius:6px; transition:background .15s ease; position:relative;
+  }
+  .nav-action:hover{ background:rgba(255,255,255,0.35); }
+  .nav-action .caret{ font-size:8px; opacity:0.6; }
+  .nav-action .ic{ font-size:19px; }
+  .cart-badge{ position:relative; }
+  .cart-count{
+    position:absolute; top:-4px; right:6px; background:var(--plum); color:#fff;
+    font-size:10px; font-weight:800; border-radius:50%; width:17px; height:17px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .mobile-menu-btn{ display:none; background:#fff; border:none; border-radius:6px; width:38px; height:38px; font-size:18px; cursor:pointer; }
+
+  /* dropdown panels (account + cart) */
+  .dropdown-panel{
+    display:none; position:absolute; top:calc(100% + 10px); right:0; background:#fff; color:var(--ink);
+    border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 32px rgba(0,0,0,0.16);
+    min-width:220px; z-index:80; overflow:hidden; text-align:left;
+    animation: dropIn .15s ease;
+  }
+  @keyframes dropIn{ from{ opacity:0; transform:translateY(-6px); } to{ opacity:1; transform:translateY(0); } }
+  .nav-item:hover .dropdown-panel, .dropdown-panel.open{ display:block; }
+  .dropdown-panel::before{
+    content:''; position:absolute; top:-6px; right:18px; width:12px; height:12px; background:#fff;
+    border-left:1px solid var(--border); border-top:1px solid var(--border); transform:rotate(45deg);
+  }
+  .dd-item{
+    display:block; width:100%; text-align:left; padding:11px 16px; font-size:13.5px; font-weight:600;
+    background:none; border:none; cursor:pointer; color:var(--ink);
+  }
+  .dd-item:hover{ background:#f4f6f5; }
+  .dd-divider{ height:1px; background:var(--border); margin:4px 0; }
+  .dd-header{ padding:12px 16px 6px; font-size:12px; color:var(--muted); font-weight:700; }
+
+  .cart-panel{ width:300px; padding:14px; }
+  .cart-panel .cp-empty{ padding:20px 4px; text-align:center; color:var(--muted); font-size:13.5px; }
+  .cp-item{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .cp-item:last-child{ border-bottom:none; }
+  .cp-item .cp-img{ width:38px; height:38px; border-radius:6px; background:#f1f3f2; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .cp-item .cp-title{ flex:1; font-size:12.5px; font-weight:600; line-height:1.3; }
+  .cp-item .cp-qty{ font-size:11.5px; color:var(--muted); }
+  .cp-item .cp-price{ font-size:12.5px; font-weight:700; }
+  .cp-subtotal{ display:flex; justify-content:space-between; font-size:13.5px; font-weight:800; padding:10px 0; border-top:1px solid var(--border); margin-top:6px; }
+  .cp-actions{ display:flex; gap:8px; margin-top:10px; }
+  .cp-actions button{ flex:1; border-radius:6px; padding:9px; font-size:12.5px; font-weight:700; cursor:pointer; border:1px solid var(--border); background:#fff; }
+  .cp-actions button.primary{ background:var(--plum); color:#fff; border-color:var(--plum); }
+
+  /* ===== toast ===== */
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ===== shop view ===== */
+  .cat-chip-row{
+    background:#FF7A54; padding:10px 24px; display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .cat-chip{
+    background:rgba(255,255,255,0.5); border:none; border-radius:14px; padding:6px 14px;
+    font-size:12.5px; font-weight:700; color:var(--plum-dark); cursor:pointer;
+  }
+  .cat-chip.active{ background:var(--plum-dark); color:#fff; }
+
+  .hero{
+    background: linear-gradient(135deg, var(--plum-dark), #1A0F2E);
+    position:relative; padding: 54px 24px; display:flex; align-items:center; justify-content:center;
+    min-height: 240px; overflow:hidden; text-align:center;
+  }
+  .hero-arrow{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:36px; height:36px; background:#dcdcdc; opacity:0.85;
+    display:flex; align-items:center; justify-content:center; border:none;
+    font-size:16px; cursor:pointer; color:#333; border-radius:50%;
+  }
+  .hero-arrow.left{ left:20px; } .hero-arrow.right{ right:20px; }
+  .hero-flag{ display:inline-block; font-size:14px; font-weight:800; font-style:italic; color:#f2b23c; transform:rotate(-6deg); margin-bottom:-6px; }
+  .hero-title{ font-size:58px; font-weight:900; font-style:italic; color:var(--yellow); letter-spacing:1px; line-height:0.95; margin:6px 0 18px; }
+  .hero-btn{ background:var(--yellow); color:#06232e; border:none; border-radius:4px; padding:11px 24px; font-size:14px; font-weight:700; cursor:pointer; }
+  .hero-dots{ position:absolute; bottom:-30px; left:50%; transform:translateX(-50%); display:flex; gap:8px; }
+  .hero-dots button{ width:7px; height:7px; border-radius:50%; background:#c7c7c7; border:none; padding:0; cursor:pointer; }
+  .hero-dots button.active{ background:#666; }
+
+  .container{ max-width:1200px; margin:0 auto; padding: 0 24px; }
+  section.shelf{ padding: 40px 24px 8px; max-width:1200px; margin:0 auto; }
+  .shelf-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; }
+  .shelf-head h2{ margin:0; font-size:22px; }
+  .shelf-head p{ margin:2px 0 0; color:var(--muted); font-size:13.5px; }
+  .shelf-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .card{ border:1px solid var(--border); border-radius:8px; overflow:hidden; display:flex; flex-direction:column; background:#fff; }
+  .card-img{ height:130px; display:flex; align-items:center; justify-content:center; font-size:38px; background:#f1f3f2; }
+  .card-body{ padding:12px 14px 16px; flex:1; display:flex; flex-direction:column; gap:4px; }
+  .card-price{ font-size:18px; font-weight:800; }
+  .card-price sup{ font-size:11px; }
+  .card-price .ref{ font-weight:400; font-size:12px; color:var(--muted); text-decoration:line-through; margin-left:6px; }
+  .card-title{ font-size:13.5px; line-height:1.35; color:var(--ink); }
+  .add-btn{ margin-top:6px; align-self:flex-start; background:var(--plum); color:#fff; border:none; border-radius:14px; padding:6px 14px; font-size:12px; font-weight:700; cursor:pointer; }
+
+  .poll-section{ padding:44px 24px 40px; max-width:1200px; margin:0 auto; }
+  .poll-section h2{ margin:0 0 2px; font-size:22px; }
+  .poll-section > p{ margin:0 0 22px; color:var(--muted); font-size:13.5px; }
+  .poll-box{ max-width:480px; }
+  .poll-box .kicker{ color:var(--coral-dark); font-weight:700; font-size:13px; margin-bottom:6px; }
+  .poll-box h3{ margin:0 0 12px; font-size:16px; }
+  .poll-option{ display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:10px; }
+  .poll-actions{ display:flex; align-items:center; gap:14px; margin-top:14px; }
+  .vote-btn{ background:var(--coral); border:none; border-radius:4px; padding:9px 20px; font-weight:700; font-size:14px; cursor:pointer; color:#fff; }
+  .discuss-link{ font-size:14px; font-weight:700; color:var(--ink); border:1px solid var(--border); border-radius:4px; padding:9px 16px; display:flex; align-items:center; gap:6px; background:none; cursor:pointer; }
+  .discuss-count{ background:#e35a1c; color:#fff; font-size:11px; font-weight:800; padding:1px 6px; border-radius:10px; }
+  .poll-result-row{ display:flex; align-items:center; gap:8px; font-size:13.5px; margin-bottom:6px; }
+  .poll-bar-track{ flex:1; height:10px; background:#eee; border-radius:6px; overflow:hidden; }
+  .poll-bar-fill{ height:100%; background:var(--coral); }
+
+  /* ===== cart view ===== */
+  .cart-wrap{ max-width:1200px; margin:0 auto; padding: 34px 24px 60px; display:grid; grid-template-columns: 1fr 320px; gap:36px; align-items:start; }
+  .cart-main h1{ font-size:26px; margin:0 0 16px; }
+  .empty-box{ border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; padding:34px 30px; gap:26px; }
+  .empty-bubble{ background:var(--champagne); color:var(--ink); font-weight:800; font-size:18px; padding:16px 20px; border-radius:16px 16px 16px 2px; max-width:260px; line-height:1.25; }
+  .empty-monkey{ font-size:64px; line-height:1; }
+  .divider-v{ width:1px; align-self:stretch; background:var(--border); }
+  .signin-block{ flex:1; text-align:center; font-size:15px; }
+  .cart-items{ border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .cart-item{ display:flex; align-items:center; gap:16px; padding:18px 20px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .cart-item:last-child{ border-bottom:none; }
+  .cart-item-img{ width:56px; height:56px; border-radius:6px; background:#f1f3f2; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0; }
+  .cart-item-info{ flex:1; min-width:150px; }
+  .cart-item-title{ font-size:14.5px; font-weight:600; margin-bottom:4px; }
+  .cart-item-price{ font-size:13px; color:var(--muted); }
+  .qty-control{ display:flex; align-items:center; gap:10px; border:1px solid var(--border); border-radius:20px; padding:4px 10px; }
+  .qty-control button{ background:none; border:none; font-size:15px; font-weight:800; cursor:pointer; width:20px; color:var(--ink); }
+  .cart-item-total{ font-size:14.5px; font-weight:700; width:70px; text-align:right; }
+  .remove-link{ font-size:12.5px; color:#b23a3a; font-weight:600; cursor:pointer; margin-left:14px; background:none; border:none; }
+  .missed-section{ margin-top:40px; }
+  .missed-section h1{ font-size:22px; margin:0 0 16px; }
+  .missed-box{ border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:24px; padding:34px 30px; }
+  .sidebar{ border:1px solid var(--border); border-radius:8px; padding:20px; }
+  .checkout-btn{ width:100%; border:1px solid var(--border); border-radius:6px; padding:14px; font-size:15px; font-weight:700; cursor:pointer; margin-bottom:18px; background:#eee; color:#8a8a8a; }
+  .checkout-btn.ready{ background:var(--plum); color:#fff; border-color:var(--plum); }
+  .sidebar .line{ font-size:14px; margin-bottom:10px; }
+  .sidebar .subtotal{ font-size:15px; font-weight:800; padding-top:10px; border-top:1px solid var(--border); margin-top:4px; }
+  .sidebar .ships{ font-size:13.5px; font-weight:700; margin-top:18px; }
+  .ships-detail{ margin-top:10px; font-size:12.5px; color:#333; background:#f4f6f5; border-radius:6px; padding:10px 12px; display:none; }
+  .ships-detail.open{ display:block; }
+  body{ overflow-x:hidden; }
+
+  /* ===== checkout view ===== */
+  .checkout-wrap{ max-width:640px; margin:0 auto; padding:40px 24px 70px; }
+  .checkout-steps{ display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:32px; }
+  .co-step{ display:flex; align-items:center; gap:8px; }
+  .co-dot{
+    width:28px; height:28px; border-radius:50%; background:#eee; color:var(--muted);
+    display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:800;
+  }
+  .co-step.active .co-dot{ background:var(--plum); color:#fff; }
+  .co-step.done .co-dot{ background:var(--coral); color:#fff; }
+  .co-label{ font-size:12.5px; font-weight:700; color:var(--muted); }
+  .co-step.active .co-label{ color:var(--ink); }
+  .co-line{ width:36px; height:2px; background:#eee; }
+  .checkout-card{ border:1px solid var(--border); border-radius:10px; padding:26px; }
+  .checkout-card h2{ margin:0 0 18px; font-size:20px; }
+  .co-field-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .co-note{ font-size:12px; color:var(--muted); background:#f4f6f5; padding:10px 12px; border-radius:6px; margin-bottom:16px; }
+  .co-actions{ display:flex; justify-content:space-between; margin-top:22px; gap:10px; }
+  .co-back-btn{ background:#fff; border:1px solid var(--border); border-radius:6px; padding:12px 20px; font-size:14px; font-weight:700; cursor:pointer; }
+  .co-next-btn{ background:var(--plum); color:#fff; border:none; border-radius:6px; padding:12px 24px; font-size:14px; font-weight:700; cursor:pointer; flex:1; }
+  .co-review-row{ display:flex; justify-content:space-between; font-size:14px; padding:8px 0; border-bottom:1px solid var(--border); }
+  .co-review-row:last-child{ border-bottom:none; font-weight:800; padding-top:12px; }
+  .co-confirm{ text-align:center; padding:20px 0; }
+  .co-confirm .big-check{ font-size:52px; margin-bottom:10px; }
+  .co-confirm h2{ margin:0 0 8px; }
+  .co-confirm .order-no{ font-family:monospace; font-weight:700; background:#f4f6f5; padding:4px 10px; border-radius:6px; display:inline-block; margin:8px 0 20px; }
+
+  /* ===== account view ===== */
+  .acct-wrap{ max-width:440px; margin: 50px auto; padding: 0 24px; }
+  .acct-wrap h1{ font-size:24px; margin:0 0 6px; }
+  .acct-wrap p.sub{ color:var(--muted); font-size:14px; margin:0 0 26px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; }
+  .field input{ width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:6px; font-size:16px; }
+  .signin-btn{ width:100%; background:var(--plum); color:#fff; border:none; border-radius:6px; padding:13px; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px; }
+  .amazon-note{ margin-top:20px; padding:14px 16px; background:#f4f6f5; border-radius:6px; font-size:13px; color:#333; }
+  .switch-line{ margin-top:20px; font-size:13.5px; text-align:center; }
+  .error-msg{ color:#b23a3a; font-size:12.5px; margin-top:-8px; margin-bottom:12px; display:none; }
+  .field.error input{ border-color:#b23a3a; background:#fff5f5; }
+  .field.error label{ color:#b23a3a; }
+  .profile-card{ border:1px solid var(--border); border-radius:10px; padding:26px; text-align:center; }
+  .avatar-circle{ width:64px; height:64px; border-radius:50%; background:var(--coral); color:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800; margin:0 auto 14px; }
+  .profile-card h2{ margin:0 0 2px; font-size:19px; }
+  .profile-card .email{ color:var(--muted); font-size:13.5px; margin-bottom:20px; }
+  .profile-stats{ display:flex; justify-content:center; gap:28px; margin-bottom:22px; }
+  .profile-stats div{ text-align:center; }
+  .profile-stats .num{ font-size:18px; font-weight:800; display:block; }
+  .profile-stats .lbl{ font-size:11.5px; color:var(--muted); }
+  .profile-links{ text-align:left; border-top:1px solid var(--border); padding-top:16px; margin-bottom:18px; }
+  .profile-links button{ display:block; width:100%; text-align:left; font-size:14px; font-weight:600; color:var(--ink); padding:9px 4px; background:none; border:none; cursor:pointer; }
+  .profile-links button:hover{ background:#f4f6f5; }
+  .signout-btn{ width:100%; background:#fff; color:var(--ink); border:1px solid var(--border); border-radius:6px; padding:11px; font-size:14px; font-weight:700; cursor:pointer; }
+
+  /* ===== forums view ===== */
+  .forum-topbar{ display:flex; align-items:center; justify-content:space-between; padding:14px 24px; border-bottom:1px solid var(--border); }
+  .forum-topbar .actions{ display:flex; align-items:center; gap:14px; position:relative; }
+  .login-btn{ background: linear-gradient(135deg, var(--champagne), var(--champagne-dark)); color:var(--plum); border:1px solid #C9A66B; border-radius:20px; padding:8px 16px; font-size:14px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 1px 2px rgba(0,0,0,0.15); }
+  .icon-btn{ width:34px;height:34px;border-radius:50%; display:flex;align-items:center;justify-content:center; border:1px solid var(--border); background:#fff; cursor:pointer; color:var(--muted); }
+  .icon-btn.active{ background:var(--coral); color:#fff; border-color:var(--coral); }
+  .banner{ background: var(--coral); position:relative; padding: 40px 24px 44px; overflow:hidden; text-align:center; }
+  .banner-inner{ max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:28px; position:relative; }
+  .banner-inner button{ display:flex; align-items:center; gap:14px; background:none; border:none; cursor:pointer; padding:0; }
+  .banner-mark{ flex-shrink:0; filter: drop-shadow(3px 3px 0 rgba(26,26,26,0.15)); }
+  .banner-wordmark{ font-size:56px; font-weight:900; font-style:italic; letter-spacing:1px; color:#fff; -webkit-text-stroke: 3px var(--ink); text-shadow: 4px 4px 0 var(--ink); }
+  .welcome{ font-family: Georgia, serif; font-style:italic; font-weight:700; font-size:26px; color:var(--ink); line-height:1.15; }
+  .bubble{ position:absolute; font-weight:800; padding:6px 12px; border-radius:40% 40% 40% 4px; font-size:15px; color:var(--ink); transform:rotate(-6deg); }
+  .bubble.b1{ background:#f4c04a; top:6px; left:2%; border-radius:6px 40% 40% 40%; }
+  .bubble.b2{ background:#e9a7d6; top:0; left:16%; border-radius:50%; padding:14px; }
+  .bubble.b3{ background:#7fe0a0; bottom:2px; left:2%; border-radius:40% 6px 40% 40%; transform:rotate(4deg);}
+  .bubble.b4{ background:#f28fc0; top:2px; right:2%; border-radius:4px 40% 40% 40%; transform:rotate(6deg); font-size:20px;}
+  .bubble.b5{ background:#f6d24a; top:30px; right:14%; border-radius:50%; padding:12px; }
+  .bubble.b6{ background:#3fb8c9; bottom:0; right:0%; border-radius:40% 40% 4px 40%; transform:rotate(-3deg);}
+  .fcta-row{ display:flex; justify-content:center; gap:14px; padding: 20px 16px; flex-wrap:wrap; }
+  .fcta-btn{ background:#f0f0ee; border:1px solid var(--border); border-radius:8px; padding:10px 18px; font-size:14px; font-weight:600; color:var(--ink); cursor:pointer; display:flex; align-items:center; gap:8px; }
+  .notice{ background:#dff5e6; text-align:center; padding:12px 16px; font-size:13px; margin: 0 24px 16px; border-radius:4px; }
+  .tabs-row{ display:flex; align-items:center; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .tab-chip{ border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:14px; font-weight:600; background:#fff; cursor:pointer; }
+  .tab-plain{ font-size:14px; font-weight:600; color:var(--ink); padding:7px 6px; cursor:pointer; border-bottom:2px solid transparent; background:none; border-top:none; border-left:none; border-right:none; }
+  .tab-plain.active{ border-bottom-color: var(--ink); }
+  .updated-banner{ background:#dff5e6; padding:10px 16px; font-size:14px; border-radius:4px; margin-bottom:10px; }
+  .fgrid{ display:grid; grid-template-columns: 1.65fr 1fr; gap:0 40px; align-items:start; }
+  .fgrid.full{ grid-template-columns: 1fr; }
+  .fgrid.full #categoryCol{ display:none; }
+  .col-head{ display:flex; justify-content:space-between; font-size:13px; color:var(--muted); font-weight:600; padding: 10px 4px; border-bottom:1px solid var(--border); }
+  .cat-row{ display:flex; padding: 20px 16px; border-left: 5px solid transparent; border-bottom: 1px solid #fff; gap: 18px; cursor:pointer; }
+  .cat-row.deal{ background:#dff5e6; border-left-color:#0f9a4a; }
+  .cat-row.shen{ background:#fbf0cf; border-left-color:#d99a1c; }
+  .cat-row.info{ background:#d9f0f5; border-left-color:#1f7a95; }
+  .cat-row.artist{ background:#d7f5e2; border-left-color:#2a9d5c; }
+  .cat-row.ebw{ background:#fbe3f0; border-left-color:#b23a6b; }
+  .cat-icon{ font-size:28px; width:52px; height:52px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .cat-body{ flex:1; }
+  .cat-top{ display:flex; justify-content:space-between; align-items:flex-start; }
+  .cat-badge{ display:inline-block; font-weight:800; font-style:italic; font-size:14px; color:#fff; padding: 3px 10px; border-radius:4px; margin-bottom:4px; }
+  .cat-desc{ font-size:13.5px; line-height:1.5; color:#333; margin: 10px 0 12px; max-width:520px; }
+  .tag-row{ display:flex; flex-wrap:wrap; gap:6px; }
+  .tag{ background:var(--plum); color:#fff; font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:4px; }
+  .cat-count{ font-size:13.5px; font-weight:700; text-align:right; white-space:nowrap; }
+  .cat-count small{ display:block; font-weight:500; color:var(--muted); font-size:11.5px; }
+  .latest-list{ border-top:1px solid var(--border); }
+  .latest-item{ display:flex; gap:12px; align-items:flex-start; padding: 14px 4px; border-bottom:1px solid var(--border); }
+  .avatar{ width:40px; height:40px; border-radius:50%; background:#eee; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .latest-body{ flex:1; min-width:0; }
+  .latest-title{ font-size:14px; font-weight:600; color:var(--ink); line-height:1.3; display:block; margin-bottom:6px; background:none; border:none; text-align:left; cursor:pointer; padding:0; }
+  .latest-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .cat-pill{ font-size:11px; font-weight:700; padding:2px 8px; border-radius:3px; color:#fff; }
+  .cat-pill.shen{ background:#e05a2b; } .cat-pill.ebw{ background:#b23a6b; } .cat-pill.computers, .cat-pill.home, .cat-pill.grocery{ background:#0f5a2f; }
+  .word-pill{ font-size:11px; font-weight:600; color:var(--muted); }
+  .latest-meta{ text-align:right; font-size:13px; color:var(--muted); white-space:nowrap; flex-shrink:0; }
+  .latest-meta .count{ display:block; font-weight:700; color:var(--ink); }
+  .latest-meta .count.orange{ color:#c9611c; }
+  .more-btn{ display:block; margin-left:auto; margin-top:14px; background:#fff; border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+  .leaderboard{ margin-top:26px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .leaderboard-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--border); }
+  .leaderboard-head h3{ margin:0; font-size:15px; }
+  .lb-toggle{ display:flex; gap:6px; }
+  .lb-toggle-btn{ background:#f0f0ee; border:1px solid var(--border); border-radius:14px; padding:4px 12px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--muted); }
+  .lb-toggle-btn.active{ background:var(--plum); color:#fff; border-color:var(--plum); }
+  .lb-row{ display:flex; align-items:center; gap:12px; padding:10px 16px; border-bottom:1px solid var(--border); font-size:13.5px; }
+  .lb-rank{ width:20px; font-weight:800; color:var(--muted); }
+  .lb-rank.gold{ color:#c9611c; }
+  .lb-avatar{ width:30px; height:30px; border-radius:50%; background:#dff5e6; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .lb-name{ flex:1; font-weight:600; }
+  .lb-points{ font-weight:700; color:#0f9a4a; }
+  .search-box{ position:absolute; top:44px; right:60px; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:none; padding:10px; z-index:50; }
+  .search-box.open{ display:block; }
+  .search-box input{ border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:16px; width:200px; }
+  .menu-dropdown{ position:absolute; top:44px; right:0; background:#fff; border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:none; min-width:180px; z-index:50; overflow:hidden; }
+  .menu-dropdown.open{ display:block; }
+  .menu-dropdown button{ display:block; width:100%; text-align:left; padding:11px 16px; font-size:14px; font-weight:600; color:var(--ink); border:none; background:none; cursor:pointer; border-bottom:1px solid var(--border); }
+  .menu-dropdown button:last-child{ border-bottom:none; }
+  .menu-dropdown button:hover{ background:#f4f6f5; }
+  .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:1000; padding:20px; }
+  .modal-backdrop.open{ display:flex; }
+  .modal-box{ background:#fff; border-radius:10px; max-width:520px; width:100%; padding:26px; position:relative; max-height:80vh; overflow-y:auto; }
+  .modal-close{ position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--muted); }
+  .modal-box h3{ margin:0 0 6px; font-size:19px; }
+  .modal-box .modal-meta{ font-size:12.5px; color:var(--muted); margin-bottom:14px; }
+  .modal-box p{ font-size:14px; line-height:1.6; color:#333; }
+
+  /* ===== brand kit view ===== */
+  .bk-appbar{ background:var(--ink); color:#fff; padding:14px 24px; display:flex; align-items:center; gap:18px; }
+  .bk-search{ flex:1; max-width:520px; margin:0 auto; position:relative; }
+  .bk-search input{ width:100%; padding:9px 14px 9px 36px; border-radius:6px; border:none; font-size:16px; }
+  .bk-search .ic{ position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#888; font-size:14px; }
+  .bk-container{ max-width:1200px; margin:0 auto; padding: 24px 24px 80px; }
+  .bk-filter-bar{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+  .bk-filter-group{ display:flex; align-items:center; gap:6px; }
+  .bk-filter-label{ font-size:12px; font-weight:700; color:var(--muted); margin-right:2px; }
+  .chip{ border:1px solid var(--border); background:#fff; border-radius:16px; padding:6px 14px; font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink); }
+  .chip.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .bk-sort{ border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:12.5px; font-weight:600; background:#fff; cursor:pointer; }
+  .asset-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:18px; margin-bottom:50px; }
+  .asset-card{ border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
+  .asset-stage{ height:140px; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .asset-stage.bg-light{ background:#fff; } .asset-stage.bg-dark{ background:#1a1a1a; } .asset-stage.bg-coral{ background:var(--coral); }
+  .asset-meta{ padding:12px 14px 14px; border-top:1px solid var(--border); }
+  .asset-name{ font-size:13.5px; font-weight:700; margin-bottom:2px; }
+  .asset-sub{ font-size:11.5px; color:var(--muted); margin-bottom:10px; }
+  .dl-btn{ width:100%; background:#f0f0ee; border:1px solid var(--border); border-radius:6px; padding:7px; font-size:12px; font-weight:700; cursor:pointer; }
+  .swatch-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+  .swatch{ border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff; }
+  .swatch-color{ height:70px; }
+  .swatch-meta{ padding:10px 12px; }
+  .swatch-copy{ margin-top:8px; width:100%; background:#f0f0ee; border:1px solid var(--border); border-radius:6px; padding:5px; font-size:11.5px; font-weight:700; cursor:pointer; }
+
+  footer.site-footer{ background:#f4f6f5; margin-top:20px; padding: 40px 24px 20px; }
+  .footer-grid{ max-width:1200px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); gap:30px; }
+  .footer-grid h4{ font-size:13px; margin:0 0 12px; }
+  .footer-grid ul{ list-style:none; margin:0; padding:0; }
+  .footer-grid li{ margin-bottom:8px; font-size:13px; }
+  .footer-grid button{ background:none; border:none; padding:0; font-size:13px; cursor:pointer; color:var(--ink); }
+  .fine-print{ font-size:11.5px; color:var(--muted); line-height:1.6; }
+  .footer-bottom{ max-width:1200px; margin: 26px auto 0; padding-top:18px; border-top:1px solid var(--border); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:11.5px; color:var(--muted); }
+
+  @media (max-width: 900px){
+    .shelf-grid{ grid-template-columns:repeat(2,1fr); }
+    .footer-grid{ grid-template-columns:repeat(2,1fr); }
+    .hero-title{ font-size:40px; }
+    .cart-wrap{ grid-template-columns:1fr; }
+    .fgrid{ grid-template-columns:1fr; }
+  }
+  @media (max-width: 720px){
+    .mobile-menu-btn{ display:block; }
+    .main-tabs{
+      display:none; position:absolute; top:100%; left:0; right:0; background:var(--coral);
+      flex-direction:column; align-items:stretch; padding:8px 16px 14px; gap:2px; z-index:60;
+      box-shadow:0 8px 16px rgba(0,0,0,0.12);
+    }
+    .main-tabs.open{ display:flex; }
+    .main-tab{ text-align:left; border-radius:6px; padding:12px 14px; }
+    .topnav{ position:relative; }
+    .cat-chip-row{ overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .cat-chip-row::-webkit-scrollbar{ display:none; }
+    .cat-chip{ flex-shrink:0; }
+    .dropdown-panel{ position:fixed; top:auto; bottom:0; left:0; right:0; border-radius:14px 14px 0 0; max-height:70vh; overflow-y:auto; }
+    .dropdown-panel::before{ display:none; }
+    .cart-panel{ width:auto; }
+    .checkout-steps{ flex-wrap:wrap; }
+    .search-box, .menu-dropdown{ position:fixed; top:auto; bottom:0; left:0; right:0; border-radius:14px 14px 0 0; }
+    .search-box input{ width:100%; }
+  }
+  @media (max-width: 480px){
+    .topnav{ padding:10px 14px; }
+    .logo-block .subtag{ display:none; }
+    .promo-bar{ font-size:11px; padding:6px 10px; }
+    .hero{ padding:38px 16px; min-height:190px; }
+    .hero-title{ font-size:30px; }
+    .hero-flag{ font-size:12px; }
+    .hero-arrow{ width:30px; height:30px; font-size:14px; }
+    .hero-arrow.left{ left:8px; } .hero-arrow.right{ right:8px; }
+    section.shelf, .poll-section, .container, .cart-wrap, .bk-container, .checkout-wrap{ padding-left:14px; padding-right:14px; }
+    .shelf-grid{ grid-template-columns:repeat(2,1fr); gap:10px; }
+    .card-img{ height:100px; font-size:30px; }
+    .card-title{ font-size:12.5px; }
+    .co-field-row{ grid-template-columns:1fr; }
+    .cart-item{ gap:10px; }
+    .cart-item-info{ min-width:100%; order:1; }
+    .cart-item-img{ order:0; }
+    .qty-control{ order:2; }
+    .cart-item-total{ order:3; }
+    .remove-link{ order:4; margin-left:auto; }
+    .footer-grid{ grid-template-columns:1fr 1fr; gap:20px; }
+    .banner-wordmark{ font-size:36px; }
+    .welcome{ font-size:18px; }
+    .bubble{ display:none; }
+    .asset-grid{ grid-template-columns:repeat(2,1fr); }
+    .swatch-grid{ grid-template-columns:repeat(2,1fr); }
+    .nav-actions{ gap:12px; }
+    .main-tab{ font-size:13px; padding:8px 10px; }
+    .cat-row{ flex-direction:column; gap:10px; padding:16px 14px; }
+    .cat-icon{ width:auto; height:auto; font-size:24px; justify-content:flex-start; }
+    .cat-top{ flex-direction:column; align-items:flex-start; gap:6px; }
+    .cat-count{ text-align:left; }
+    .cat-badge{ font-size:13px; }
+    .cat-desc{ font-size:13px; }
+    .tag{ font-size:11px; padding:3px 8px; }
+    .latest-item{ gap:8px; }
+    .avatar{ width:34px; height:34px; font-size:16px; }
+    .latest-title{ font-size:13px; }
+  }
+
+  /* ===== hover polish ===== */
+  .card{ transition: box-shadow .18s ease, transform .18s ease; }
+  .card:hover{ box-shadow:0 10px 24px rgba(0,0,0,0.10); transform:translateY(-3px); }
+  .add-btn{ transition: background .15s ease, transform .1s ease; }
+  .add-btn:hover{ background:var(--coral); }
+  .add-btn:active{ transform:scale(0.96); }
+  .cat-chip{ transition: background .15s ease, transform .1s ease; }
+  .cat-chip:hover:not(.active){ background:rgba(255,255,255,0.8); }
+  .main-tab{ transition: background .15s ease; }
+  .hero-btn{ transition: transform .15s ease, box-shadow .15s ease; }
+  .hero-btn:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.25); }
+  .hero-arrow{ transition: background .15s ease; }
+  .hero-arrow:hover{ background:#fff; }
+  .vote-btn:hover, .discuss-link:hover{ filter:brightness(0.95); }
+  .fcta-btn{ transition: box-shadow .15s ease, transform .1s ease; }
+  .fcta-btn:hover{ box-shadow:0 4px 12px rgba(0,0,0,0.1); transform:translateY(-1px); }
+  .checkout-btn.ready{ transition: filter .15s ease; }
+  .checkout-btn.ready:hover{ filter:brightness(1.1); }
+  .signin-btn:hover{ filter:brightness(1.1); }
+  .qty-control button:hover{ color:var(--coral); }
+  .remove-link:hover{ text-decoration:underline; }
+  .tab-plain{ transition: color .15s ease; }
+  .tab-plain:hover{ color:var(--coral-dark); }
+  .cat-row{ transition: filter .15s ease; }
+  .cat-row:hover{ filter:brightness(0.97); }
+  .latest-title:hover{ color:var(--coral-dark); text-decoration:underline; }
+  .icon-btn{ transition: background .15s ease, color .15s ease; }
+  .icon-btn:hover{ background:#f4f6f5; }
+  .dl-btn:hover{ background:var(--coral); color:#fff; border-color:var(--coral); }
+  .swatch-copy:hover{ background:var(--champagne); }
+  .chip:hover:not(.active){ background:#f4f6f5; }
+  .profile-links button, .signout-btn{ transition: background .15s ease; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--coral); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal();">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle"></h3>
+    <div class="modal-meta" id="modalMeta"></div>
+    <p id="modalBody"></p>
+  </div>
+</div>
+
+<!-- ============ SHARED HEADER ============ -->
+<div class="promo-bar">
+  <span class="badge">HIBBAI+</span> Free shipping over $35, every day. <a href="#" onclick="toast('Hibbai+ shipping details coming soon'); return false;">Learn more</a>
+</div>
+<div class="topnav">
+  <button class="logo-block" onclick="showView('shop')">
+    <svg class="logo-mark" width="28" height="28" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#FF5A36"/>
+      <circle cx="11" cy="13.5" r="1.7" fill="#1a1a1a"/>
+      <circle cx="19" cy="13.5" r="1.7" fill="#1a1a1a"/>
+      <path d="M11 18.5C12.6 20.4 17.4 20.4 19 18.5" stroke="#1a1a1a" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+    </svg>
+    <div class="logo-text">
+      <div class="wordmark"><span class="wm-h">Hibbai</span><span class="wm-bang">!</span></div>
+      <div class="subtag">shop &middot; chat &middot; win</div>
+    </div>
+  </button>
+
+  <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
+
+  <div class="main-tabs" id="mainTabs">
+    <button class="main-tab active" id="tabbtn-shop" onclick="showView('shop')">Shop</button>
+    <button class="main-tab" id="tabbtn-forums" onclick="showView('forums')">Forums</button>
+    <button class="main-tab" id="tabbtn-brandkit" onclick="showView('brandkit')">Brand Kit</button>
+  </div>
+
+  <div class="nav-actions" id="navActions">
+    <div class="nav-item">
+      <button class="nav-action" onclick="toggleAcctDropdown(event)"><span class="ic">👤</span><span id="acctLabel">Sign In</span> <span class="caret">▾</span></button>
+      <div class="dropdown-panel" id="acctDropdown"></div>
+    </div>
+    <div class="nav-item">
+      <button class="nav-action cart-badge" onclick="toggleCartDropdown(event)"><span class="ic">🛒</span><span class="cart-count" id="cartCount">0</span></button>
+      <div class="dropdown-panel cart-panel" id="cartDropdown"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SHOP VIEW ============ -->
+<div class="view active" id="view-shop">
+
+  <div class="cat-chip-row" id="catChipRow"></div>
+
+  <div class="hero">
+    <button class="hero-arrow left" onclick="heroShift(-1)">&#8249;</button>
+    <div>
+      <div class="hero-flag" id="heroFlag">Never before seen finds</div>
+      <div class="hero-title" id="heroTitle">DEBUT<br>DEALS</div>
+      <button class="hero-btn" onclick="document.getElementById('shopGridAnchor').scrollIntoView({behavior:'smooth'})">View deals</button>
+    </div>
+    <button class="hero-arrow right" onclick="heroShift(1)">&#8250;</button>
+    <div class="hero-dots" id="heroDots"></div>
+  </div>
+
+  <section class="shelf" id="shopGridAnchor">
+    <div class="shelf-head">
+      <div><h2 id="shopGridTitle">All Deals</h2><p id="shopGridSub">Everything on Hibbai right now.</p></div>
+    </div>
+    <div class="shelf-grid" id="shopGrid"></div>
+  </section>
+
+  <section class="poll-section">
+    <h2>What's Up with Hibbai!</h2>
+    <p>We're more than just deals, you know...</p>
+    <div class="poll-box">
+      <div class="kicker">Hibbai Asks</div>
+      <h3>Is it too early for Christmas music?</h3>
+      <div id="pollForm">
+        <label class="poll-option"><input type="radio" name="poll" value="no"> No</label>
+        <label class="poll-option"><input type="radio" name="poll" value="yes"> …we are giving you 2 minutes to exit the bldg for asking that, Hibbai Writer.</label>
+      </div>
+      <div id="pollResult" style="display:none;"></div>
+      <div class="poll-actions">
+        <button class="vote-btn" id="voteBtn" onclick="submitVote()">Vote</button>
+        <button class="discuss-link" onclick="showView('forums')">Discuss the poll <span class="discuss-count" id="discussCount">37</span></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ CART VIEW ============ -->
+<div class="view" id="view-cart">
+  <div class="cart-wrap">
+    <div class="cart-main">
+      <h1 id="cartTitle">Shopping Cart (0 items)</h1>
+      <div id="cartBody"></div>
+      <div class="missed-section">
+        <h1>Stuff You Missed (0 items)</h1>
+        <div class="missed-box">
+          <div style="font-size:52px;">🎉</div>
+          <p style="margin:0;font-size:14.5px;color:#333;max-width:420px;">When deals in your shopping cart become unavailable, this is where they live (or come to die).</p>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar">
+      <button class="checkout-btn" id="checkoutBtn" onclick="tryCheckout()">Proceed to checkout</button>
+      <div class="line" id="itemsLine">You've got 0 items in your cart.</div>
+      <div class="line subtotal" id="subtotalLine">Subtotal: $0.00</div>
+      <div class="ships">$6 Ships Your Entire Order <a href="#" onclick="toggleShips(); return false;">Learn more</a></div>
+      <div class="ships-detail" id="shipsDetail">A flat $6 shipping charge covers your entire order, no matter how many deals you add — applied once at checkout, not per item.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CHECKOUT VIEW ============ -->
+<div class="view" id="view-checkout">
+  <div class="checkout-wrap">
+    <div class="checkout-steps" id="checkoutSteps"></div>
+    <div id="checkoutStepContent"></div>
+  </div>
+</div>
+
+<!-- ============ ACCOUNT VIEW ============ -->
+<div class="view" id="view-account">
+  <div class="acct-wrap" id="guestView">
+    <h1 id="formTitle">Sign in to Hibbai!</h1>
+    <p class="sub" id="formSub">Create a free account to shop deals, track orders, and jump into the forums.</p>
+    <div class="field" id="nameField" style="display:none;">
+      <label for="acctName">Name</label>
+      <input id="acctName" type="text" placeholder="Jane Hibber">
+    </div>
+    <div class="field">
+      <label for="acctEmail">Email or mobile phone number</label>
+      <input id="acctEmail" type="text" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label for="acctPw">Password</label>
+      <input id="acctPw" type="password" placeholder="••••••••">
+    </div>
+    <div class="field" id="confirmField" style="display:none;">
+      <label for="acctPw2">Confirm password</label>
+      <input id="acctPw2" type="password" placeholder="••••••••">
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="signin-btn" id="submitBtn" onclick="submitAccountForm()">Sign in to Hibbai</button>
+    <div class="amazon-note">Your Hibbai login stays right here in this browser — this is a demo, nothing is sent anywhere.</div>
+    <div class="switch-line" id="switchLine">New to Hibbai? <a href="#" onclick="toggleAcctMode(); return false;">Create your Hibbai! account</a></div>
+  </div>
+
+  <div class="acct-wrap" id="profileView" style="display:none;">
+    <div class="profile-card">
+      <div class="avatar-circle" id="avatarInitial">H</div>
+      <h2 id="profileName">Hibber</h2>
+      <div class="email" id="profileEmail">you@example.com</div>
+      <div class="profile-stats">
+        <div><span class="num" id="statPosts">0</span><span class="lbl">Forum posts</span></div>
+        <div><span class="num" id="statOrders">0</span><span class="lbl">Orders</span></div>
+        <div><span class="num" id="statCartCount">0</span><span class="lbl">In cart</span></div>
+      </div>
+      <div class="profile-links">
+        <button onclick="showView('shop')">Continue shopping</button>
+        <button onclick="showView('cart')">View cart</button>
+        <button onclick="showView('forums')">Go to forums</button>
+      </div>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FORUMS VIEW ============ -->
+<div class="view" id="view-forums">
+  <div class="forum-topbar">
+    <div style="font-size:14px;font-weight:600;">Hibbai! Forums</div>
+    <div class="actions">
+      <button class="login-btn" id="loginBtn" onclick="showView('account')">👤 Sign In</button>
+      <div class="icon-btn" id="darkToggle" onclick="toggleDark()">◐</div>
+      <div class="icon-btn" id="searchToggle" onclick="toggleSearch()">🔍</div>
+      <div class="icon-btn" id="menuToggle" onclick="toggleMenu()">☰</div>
+      <div class="search-box" id="searchBox">
+        <input type="text" id="searchInput" placeholder="Search topics…" oninput="filterTopics()">
+      </div>
+      <div class="menu-dropdown" id="menuDropdown">
+        <button onclick="setTab('categories'); closeMenu();">Categories</button>
+        <button onclick="setTab('latest'); closeMenu();">Latest</button>
+        <button onclick="setTab('top'); closeMenu();">Top</button>
+        <button onclick="showView('account'); closeMenu();">Account</button>
+        <button onclick="showView('shop'); closeMenu();">Shop Hibbai Deals</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner">
+    <div class="bubble b1">OMG</div>
+    <div class="bubble b2">XD</div>
+    <div class="bubble b3">LOL</div>
+    <div class="bubble b4">WTF?!</div>
+    <div class="bubble b5">?!</div>
+    <div class="bubble b6">???</div>
+    <div class="banner-inner">
+      <button onclick="showView('forums')">
+        <svg class="banner-mark" width="64" height="64" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.6"/>
+          <circle cx="11" cy="13.5" r="1.9" fill="#1a1a1a"/>
+          <circle cx="19" cy="13.5" r="1.9" fill="#1a1a1a"/>
+          <path d="M11 18.5C12.6 20.6 17.4 20.6 19 18.5" stroke="#1a1a1a" stroke-width="1.9" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="banner-wordmark">HIBBAI!</div>
+      </button>
+      <div class="welcome">Welcome to<br>our community!</div>
+    </div>
+  </div>
+
+  <div class="fcta-row">
+    <button class="fcta-btn" onclick="openModal('Share Your Crap!!', 'Community', 'Post a photo of a recent Hibbai haul, a weird package your carrier mangled, or anything else you want the forum to see. Start a new topic in Deal Chatter or Everything but Hibbai to share yours.')">❓ share your crap!!</button>
+    <button class="fcta-btn" onclick="openModal('Giveaway! Enter by 9/7 @ noon CT', 'Shenanigans · 1.8k replies', 'Reply in the pinned Shenanigans thread before 9/7 at noon CT for a chance to win. One entry per Hibber — winners get picked at random and announced right in the thread.')">🎟️ giveaway! enter by 9/7 @ noon ct</button>
+  </div>
+
+  <div class="notice">** Please allow 3-4 days for customer service to respond. Do not send multiple emails. Thank you for your patience.</div>
+
+  <div class="container">
+    <div class="tabs-row">
+      <div class="tab-chip" onclick="toast('Browse by category')">categories &rsaquo;</div>
+      <div class="tab-chip" onclick="toast('Browse by tag')">tags &rsaquo;</div>
+      <button class="tab-plain active" id="tabCategories" onclick="setTab('categories')">Categories</button>
+      <button class="tab-plain" id="tabLatest" onclick="setTab('latest')">Latest</button>
+      <button class="tab-plain" id="tabTop" onclick="setTab('top')">Top</button>
+    </div>
+
+    <div class="updated-banner">See 1 new or updated topic</div>
+
+    <div class="fgrid" id="forumGrid">
+      <div id="categoryCol">
+        <div class="col-head"><span>Category</span><span>Topics</span></div>
+
+        <div class="cat-row deal">
+          <div class="cat-icon">🎉</div>
+          <div class="cat-body">
+            <div class="cat-top"><div><span class="cat-badge" style="background:#10352a;">Deal</span><span class="cat-badge" style="background:#0f9a4a;margin-left:2px;">Chatter</span></div><div class="cat-count">10.2k<small>/ week</small></div></div>
+            <p class="cat-desc">Wanna know more about a great deal? Jump in here to see what others are saying, compare reviews, and offer your own!</p>
+            <div class="tag-row"><span class="tag">Daily Deal</span><span class="tag">Flash-Off</span><span class="tag">Clearance</span><span class="tag">Computers</span><span class="tag">Electronics</span><span class="tag">Gourmet</span><span class="tag">Home &amp; Kitchen</span><span class="tag">Shirt</span><span class="tag">Tools &amp; Garden</span><span class="tag">Sports &amp; Outdoors</span><span class="tag">Grocery &amp; Household</span></div>
+          </div>
+        </div>
+
+        <div class="cat-row shen">
+          <div class="cat-icon">🎭</div>
+          <div class="cat-body">
+            <div class="cat-top"><div><span class="cat-badge" style="background:#c94b1c;">Shenanigans</span></div><div class="cat-count">91<small>/ week</small></div></div>
+            <p class="cat-desc">We do a lot of silly stuff: Mystery Grab Bags (MGBs), Deal Meter, Wacky Pricing, giveaways, and more. Come play along with us.</p>
+            <div class="tag-row"><span class="tag">Design Derby</span></div>
+          </div>
+        </div>
+
+        <div class="cat-row info">
+          <div class="cat-icon">📢</div>
+          <div class="cat-body">
+            <div class="cat-top"><div><span class="cat-badge" style="background:#0e2f57;">Information</span><span class="cat-badge" style="background:#1f9ec9;margin-left:2px;">Desk</span></div><div class="cat-count">28<small>/ week</small></div></div>
+            <p class="cat-desc">Read announcements, learn tips and tricks about Hibbai, and catch up on all the important goings-on from Hibbers and staff.</p>
+          </div>
+        </div>
+
+        <div class="cat-row artist">
+          <div class="cat-icon">✏️</div>
+          <div class="cat-body">
+            <div class="cat-top"><div><span class="cat-badge" style="background:#0f5a2f;">Artist</span><span class="cat-badge" style="background:#0f9a4a;margin-left:2px;">Central</span></div><div class="cat-count">2<small>/ week</small></div></div>
+            <p class="cat-desc">Shirt artists! This is your home. Give and get feedback on designs, learn about the derby, or just pontificate about ringspun cotton.</p>
+          </div>
+        </div>
+
+        <div class="cat-row ebw">
+          <div class="cat-icon">🚫</div>
+          <div class="cat-body">
+            <div class="cat-top"><div><span class="cat-badge" style="background:#8a1c47;">Everything</span><span class="cat-badge" style="background:#e35a9a;margin-left:2px;">But Hibbai</span></div><div class="cat-count">1<small>/ week</small></div></div>
+            <p class="cat-desc">Topics that don't need a category, or don't fit into any other existing category.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="latestCol">
+        <div class="col-head"><span id="latestColLabel">Latest</span><span></span></div>
+        <div class="latest-list" id="latestList"></div>
+        <button class="more-btn" id="moreBtn" onclick="loadMore()">More</button>
+
+        <div class="leaderboard">
+          <div class="leaderboard-head">
+            <h3>Top Hibbers</h3>
+            <div class="lb-toggle">
+              <button class="lb-toggle-btn active" data-range="week" onclick="setLeaderboardRange('week')">This Week</button>
+              <button class="lb-toggle-btn" data-range="alltime" onclick="setLeaderboardRange('alltime')">All Time</button>
+            </div>
+          </div>
+          <div id="leaderboardList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ BRAND KIT VIEW ============ -->
+<div class="view" id="view-brandkit">
+  <div class="bk-appbar">
+    <div style="font-weight:900;font-style:italic;font-size:16px;">Brand Assets</div>
+    <div class="bk-search">
+      <span class="ic">🔍</span>
+      <input type="text" id="bkSearchInput" placeholder="Search assets…" oninput="bkRender()">
+    </div>
+  </div>
+  <div class="bk-container">
+    <h1 style="font-size:20px;margin:0 0 4px;">Hibbai! Brand Assets</h1>
+    <p style="color:var(--muted);font-size:13.5px;margin:0 0 22px;">Search, filter, and download logos, icons, and graphics for the Hibbai family.</p>
+
+    <div class="bk-filter-bar">
+      <div class="bk-filter-group">
+        <span class="bk-filter-label">Type</span>
+        <button class="chip active" data-filter="type" data-value="all" onclick="bkSetFilter('type','all')">All</button>
+        <button class="chip" data-filter="type" data-value="logo" onclick="bkSetFilter('type','logo')">Logo</button>
+        <button class="chip" data-filter="type" data-value="icon" onclick="bkSetFilter('type','icon')">Icon</button>
+        <button class="chip" data-filter="type" data-value="graphic" onclick="bkSetFilter('type','graphic')">Graphic</button>
+      </div>
+      <div class="bk-filter-group">
+        <span class="bk-filter-label">Background</span>
+        <button class="chip active" data-filter="bg" data-value="all" onclick="bkSetFilter('bg','all')">All</button>
+        <button class="chip" data-filter="bg" data-value="light" onclick="bkSetFilter('bg','light')">Light</button>
+        <button class="chip" data-filter="bg" data-value="dark" onclick="bkSetFilter('bg','dark')">Dark</button>
+        <button class="chip" data-filter="bg" data-value="coral" onclick="bkSetFilter('bg','coral')">Coral</button>
+      </div>
+      <div style="flex:1;"></div>
+      <select class="bk-sort" id="bkSortSelect" onchange="bkRender()">
+        <option value="name">Name (A–Z)</option>
+        <option value="newest">Newest added</option>
+      </select>
+    </div>
+
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;" id="bkResultCount"></div>
+    <div class="asset-grid" id="bkAssetGrid"></div>
+
+    <section style="margin:40px 0;">
+      <h2 style="font-size:16px;margin:0 0 4px;">Colors</h2>
+      <p style="color:var(--muted);font-size:13px;margin:0 0 18px;">Tap any swatch to copy its hex code.</p>
+      <div class="swatch-grid" id="colorSwatchGrid"></div>
+    </section>
+
+    <section style="margin:40px 0;">
+      <h2 style="font-size:16px;margin:0 0 12px;">Usage notes</h2>
+      <p style="font-size:13.5px;color:#3a4a43;line-height:1.7;max-width:760px;">
+        The wordmark is always set in the bold italic outlined <code style="background:#f0f0ee;padding:1px 6px;border-radius:4px;">Hibbai!</code> treatment. The blob mascot sits to the left of the wordmark — coral-filled on white/dark backgrounds, white-with-ink-outline on coral backgrounds, so it never disappears into its background.
+      </p>
+    </section>
+  </div>
+</div>
+
+<!-- ============ SHARED FOOTER ============ -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div><h4>Company Info</h4><ul>
+      <li><button onclick="toast('About Us — coming soon')">About Us</button></li>
+      <li><button onclick="toast('Careers — coming soon')">Careers</button></li>
+      <li><button onclick="toast('FAQ — coming soon')">FAQ</button></li>
+      <li><button onclick="toast('Feedback — coming soon')">Feedback</button></li>
+    </ul></div>
+    <div><h4>Customer Care</h4><ul>
+      <li><button onclick="toast('Customer Service — coming soon')">Customer Service</button></li>
+      <li><button onclick="toast(&quot;Hibbai's Return Policy — coming soon&quot;)">Hibbai's Return Policy</button></li>
+      <li><button onclick="toast('Product Warranty — coming soon')">Product Warranty</button></li>
+      <li><button onclick="toast('Product Recall Notices — coming soon')">Product Recall Notices</button></li>
+      <li><button onclick="toast('Write Us — coming soon')">Write Us</button></li>
+    </ul></div>
+    <div><h4>Community</h4><ul>
+      <li><button onclick="toast('Facebook — coming soon')">Facebook</button></li>
+      <li><button onclick="toast('Twitter — coming soon')">Twitter</button></li>
+      <li><button onclick="showView('forums')">Forums</button></li>
+      <li><button onclick="toast('Everything But Hibbai — coming soon')">Everything But Hibbai</button></li>
+      <li><button onclick="toast('Developer Portal — coming soon')">Developer Portal</button></li>
+    </ul></div>
+    <div><h4>Boring Stuff</h4><ul>
+      <li><button onclick="showView('brandkit')">Hibbai Brand Assets</button></li>
+      <li><button onclick="toast('Terms and Conditions — coming soon')">Terms and Conditions</button></li>
+      <li><button onclick="toast('Prop 65 — coming soon')">Prop 65</button></li>
+      <li><button onclick="toast('Privacy Policy — coming soon')">Privacy Policy</button></li>
+      <li><button onclick="toast('Vendor Resources — coming soon')">Vendor Resources</button></li>
+    </ul></div>
+    <div><h4>The Fine Print</h4><p class="fine-print">hibbai.com is operated by Hibbai, Inc. Products on hibbai.com are sold by Hibbai, Inc. Product narratives are for entertainment purposes and frequently employ literary point of view; the narratives do not express Hibbai's editorial opinion.</p></div>
+  </div>
+  <div class="footer-bottom">
+    <span>Hibbai logos, site design, &amp; content © Hibbai, Inc. 2004-2026. All Rights Reserved.</span>
+    <span><button onclick="toast('Your Ads Privacy Choices — coming soon')" style="background:none;border:none;cursor:pointer;color:inherit;font-size:11.5px;">Your Ads Privacy Choices</button> &nbsp;|&nbsp; <button onclick="toast('Privacy Settings — coming soon')" style="background:none;border:none;cursor:pointer;color:inherit;font-size:11.5px;">Privacy Settings</button></span>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   SHARED STATE (persisted via localStorage, single runtime)
+   ========================================================= */
+function safeGet(key, fallback){
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function safeSet(key, val){
+  try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+  catch(e){ return false; }
+}
+const HibbaiAuth = {
+  getAccounts(){ return safeGet('hibbai_accounts', []); },
+  saveAccounts(list){ safeSet('hibbai_accounts', list); },
+  findAccount(email){ return this.getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase()); },
+  createAccount(name, email, password){
+    const accounts = this.getAccounts();
+    accounts.push({ name, email, password });
+    this.saveAccounts(accounts);
+    this.setSession(email);
+  },
+  setSession(email){ safeSet('hibbai_session', { email }); },
+  getSession(){ return safeGet('hibbai_session', null); },
+  clearSession(){ try { localStorage.removeItem('hibbai_session'); } catch(e){} },
+  getCurrentUser(){
+    const s = this.getSession();
+    if (!s) return null;
+    return this.findAccount(s.email) || { name: s.email.split('@')[0], email: s.email };
+  }
+};
+const HibbaiCart = {
+  getCart(){ return safeGet('hibbai_cart', []); },
+  saveCart(items){ safeSet('hibbai_cart', items); },
+  addItem(title, price){
+    const cart = this.getCart();
+    const existing = cart.find(i => i.title === title);
+    if (existing) existing.qty += 1; else cart.push({ title, price, qty: 1 });
+    this.saveCart(cart);
+    return cart;
+  },
+  setQty(title, qty){
+    let cart = this.getCart();
+    const item = cart.find(i => i.title === title);
+    if (item) item.qty = qty;
+    cart = cart.filter(i => i.qty > 0);
+    this.saveCart(cart);
+    return cart;
+  },
+  removeItem(title){ const cart = this.getCart().filter(i => i.title !== title); this.saveCart(cart); return cart; },
+  clear(){ this.saveCart([]); },
+  getCount(){ return this.getCart().reduce((n,i)=>n+i.qty, 0); },
+  getSubtotal(){ return this.getCart().reduce((s,i)=>s+i.price*i.qty, 0); }
+};
+
+let toastTimer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+   VIEW ROUTER — this is the whole fix: no page navigation,
+   just show/hide sections within the one document.
+   ========================================================= */
+let pendingViewAfterLogin = null;
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const target = document.getElementById('view-' + name);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+  const tabBtn = document.getElementById('tabbtn-' + name);
+  if (tabBtn) tabBtn.classList.add('active');
+  window.scrollTo(0, 0);
+  document.getElementById('mainTabs').classList.remove('open');
+  closeDropdowns();
+  renderHeader();
+  if (name === 'cart') renderCart();
+  if (name === 'account') renderAccountView();
+  if (name === 'brandkit') bkRender();
+  if (name === 'checkout') renderCheckout();
+}
+
+function renderHeader(){
+  const user = HibbaiAuth.getCurrentUser();
+  document.getElementById('acctLabel').textContent = user ? 'Hi, ' + user.name.split(' ')[0] : 'Sign In';
+  document.getElementById('cartCount').textContent = HibbaiCart.getCount();
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.innerHTML = user ? '👤 Hi, ' + user.name.split(' ')[0] : '👤 Sign In';
+  renderAcctDropdown();
+  renderCartDropdown();
+}
+
+/* ---- mobile nav ---- */
+function toggleMobileMenu(){
+  document.getElementById('mainTabs').classList.toggle('open');
+}
+
+/* ---- account dropdown ---- */
+function renderAcctDropdown(){
+  const user = HibbaiAuth.getCurrentUser();
+  const panel = document.getElementById('acctDropdown');
+  if (user){
+    panel.innerHTML = `
+      <div class="dd-header">Signed in as ${user.name}</div>
+      <button class="dd-item" onclick="goFromDropdown('account')">My Profile</button>
+      <button class="dd-item" onclick="goFromDropdown('cart')">My Cart</button>
+      <button class="dd-item" onclick="goFromDropdown('forums')">My Forum Posts</button>
+      <div class="dd-divider"></div>
+      <button class="dd-item" onclick="closeDropdowns(); signOut();">Sign Out</button>`;
+  } else {
+    panel.innerHTML = `
+      <div class="dd-header">Welcome to Hibbai!</div>
+      <button class="dd-item" onclick="goFromDropdown('account')">Sign In</button>
+      <button class="dd-item" onclick="openSignupFromDropdown()">Create Account</button>`;
+  }
+}
+function goFromDropdown(view){ closeDropdowns(); showView(view); }
+function openSignupFromDropdown(){
+  closeDropdowns();
+  showView('account');
+  if (acctMode !== 'signup') toggleAcctMode();
+}
+function toggleAcctDropdown(e){
+  e.stopPropagation();
+  const panel = document.getElementById('acctDropdown');
+  const cartPanel = document.getElementById('cartDropdown');
+  cartPanel.classList.remove('open');
+  panel.classList.toggle('open');
+}
+
+/* ---- cart dropdown ---- */
+function renderCartDropdown(){
+  const cart = HibbaiCart.getCart();
+  const panel = document.getElementById('cartDropdown');
+  if (cart.length === 0){
+    panel.innerHTML = `<div class="cp-empty">Your cart is empty.<br>Start adding some deals!</div>`;
+    return;
+  }
+  const rows = cart.slice(0,4).map(item => `
+    <div class="cp-item">
+      <div class="cp-img">📦</div>
+      <div class="cp-title">${item.title}<div class="cp-qty">Qty ${item.qty}</div></div>
+      <div class="cp-price">$${(item.price*item.qty).toFixed(2)}</div>
+    </div>`).join('');
+  const more = cart.length > 4 ? `<div style="font-size:11.5px;color:var(--muted);margin-top:6px;">+${cart.length-4} more item${cart.length-4===1?'':'s'}</div>` : '';
+  panel.innerHTML = `
+    ${rows}${more}
+    <div class="cp-subtotal"><span>Subtotal</span><span>$${HibbaiCart.getSubtotal().toFixed(2)}</span></div>
+    <div class="cp-actions">
+      <button onclick="goFromDropdown('cart')">View Cart</button>
+      <button class="primary" onclick="closeDropdowns(); tryCheckout();">Checkout</button>
+    </div>`;
+}
+function toggleCartDropdown(e){
+  e.stopPropagation();
+  const panel = document.getElementById('cartDropdown');
+  const acctPanel = document.getElementById('acctDropdown');
+  acctPanel.classList.remove('open');
+  renderCartDropdown();
+  panel.classList.toggle('open');
+}
+function closeDropdowns(){
+  document.getElementById('acctDropdown').classList.remove('open');
+  document.getElementById('cartDropdown').classList.remove('open');
+}
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.nav-item')) closeDropdowns();
+});
+
+/* =========================================================
+   SHOP — each category chip shows a genuinely different,
+   unique set of featured products (not the same grid reused)
+   ========================================================= */
+const PRODUCTS = [
+  { cat:'home', emoji:'🧺', priceHtml:'$6<sup>99</sup>&ndash;$149<sup>99</sup>', price:6.99, title:"Kitchen &amp; Home Storage Essentials" },
+  { cat:'home', emoji:'🍳', priceHtml:'$17<sup>99</sup>&ndash;$189<sup>99</sup>', price:17.99, title:"Upgrade Your Kitchen Game! Ninja, Cuisinart, Keurig and More" },
+  { cat:'home', emoji:'🧽', priceHtml:'$12<sup>99</sup><span class="ref">$59.99</span>', price:12.99, title:"Cuisinart Steam Cleaner Grill Brush" },
+  { cat:'home', emoji:'🚿', priceHtml:'$24<sup>99</sup><span class="ref">$39.99</span>', price:24.99, title:"HAMITOR 4-Tier Shower Caddy Tension Pole" },
+  { cat:'electronics', emoji:'📱', priceHtml:'$549<sup>99</sup>&ndash;$649<sup>99</sup>', price:549.99, title:"Samsung Galaxy S25 Edge (NEW OEM Sealed)" },
+  { cat:'electronics', emoji:'🎧', priceHtml:'$154<sup>99</sup><span class="ref">$249.99</span>', price:154.99, title:"Samsung Galaxy Buds 4 Pro AI True Wireless Earbuds" },
+  { cat:'electronics', emoji:'🔊', priceHtml:'$69<sup>99</sup><span class="ref">$129.99</span>', price:69.99, title:"Anker soundcore Boom 2 Waterproof Bluetooth Speaker" },
+  { cat:'electronics', emoji:'🔋', priceHtml:'$9<sup>99</sup><span class="ref">$19.99</span>', price:9.99, title:"(24 Pack) Energizer MAX AAA Batteries" },
+  { cat:'computers', emoji:'🔌', priceHtml:'$12<sup>99</sup><span class="ref">$29.99</span>', price:12.99, title:"HyperDrive 6-in-2 USB-C Hub" },
+  { cat:'computers', emoji:'🔌', priceHtml:'$49<sup>99</sup><span class="ref">$119.99</span>', price:49.99, title:"Belkin Connect 11-in-1 Universal USB-C Pro Dock" },
+  { cat:'computers', emoji:'🧮', priceHtml:'$79<sup>99</sup><span class="ref">$158.99</span>', price:79.99, title:"Texas Instruments TI-84 Evo Graphing Calculator" },
+  { cat:'computers', emoji:'📎', priceHtml:'$11<sup>99</sup><span class="ref">$18.99</span>', price:11.99, title:"ACCO Brands Paper Clips, Jumbo, Smooth, Economy" },
+  { cat:'tools', emoji:'🧰', priceHtml:'$3<sup>99</sup>&ndash;$127<sup>99</sup>', price:3.99, title:"Automotive Tools, Parts &amp; Accessories!" },
+  { cat:'tools', emoji:'🪚', priceHtml:'$94<sup>99</sup><span class="ref">$189.99</span>', price:94.99, title:"Worx 20V JawSaw Cordless Chainsaw" },
+  { cat:'tools', emoji:'🌿', priceHtml:'$39<sup>99</sup><span class="ref">$83.98</span>', price:39.99, title:"Lushlite Cordless Weed Wacker" },
+  { cat:'tools', emoji:'🚿', priceHtml:'$31<sup>99</sup>&ndash;$37<sup>99</sup>', price:31.99, title:"Expandable Garden Hose w/ Spray Nozzle" },
+  { cat:'sports', emoji:'💪', priceHtml:'$15<sup>99</sup><span class="ref">$29.99</span>', price:15.99, title:"Qultivo Resistance Pull Up Bands Set" },
+  { cat:'sports', emoji:'🎯', priceHtml:'$24<sup>99</sup><span class="ref">$61.75</span>', price:24.99, title:"PROHEAR Shooting Ear Muffs, NRR 23dB" },
+  { cat:'sports', emoji:'🧳', priceHtml:'$59<sup>99</sup><span class="ref">$174.99</span>', price:59.99, title:"High Sierra 34&rdquo; Wheeled Rolling Duffle Bag" },
+  { cat:'sports', emoji:'🎮', priceHtml:'$399<sup>99</sup>', price:399.99, title:"Nintendo Switch 2 Console (Grade A Refurbished)" },
+  { cat:'shirt', emoji:'🪐', priceHtml:'$15<sup>00</sup>&ndash;$32<sup>00</sup>', price:15.00, title:"A Vintage Planet" },
+  { cat:'shirt', emoji:'👕', priceHtml:'$8<sup>99</sup>&ndash;$34<sup>99</sup>', price:8.99, title:"Men's &amp; Women's Apparel Shop" },
+  { cat:'shirt', emoji:'🕹️', priceHtml:'$12<sup>00</sup>&ndash;$28<sup>00</sup>', price:12.00, title:"Retro Arcade Graphic Tee" },
+  { cat:'grocery', emoji:'💄', priceHtml:'$0<sup>50</sup>&ndash;$46<sup>99</sup>', price:0.50, title:"Beauty Deals" },
+  { cat:'grocery', emoji:'🐟', priceHtml:'$15<sup>99</sup>', price:15.99, title:"Nordic Naturals Omega-3 Fish Oil" },
+  { cat:'grocery', emoji:'🧦', priceHtml:'$9<sup>99</sup>', price:9.99, title:"Pursonic Laundry Wool Dryer Balls" },
+  { cat:'clearance', emoji:'📻', priceHtml:'$10<sup>99</sup><span class="ref">$27.99</span>', price:10.99, title:"Sylvania Proscan Elite Portable CD Boombox" },
+  { cat:'clearance', emoji:'🖊️', priceHtml:'$3<sup>99</sup>', price:3.99, title:"BC Mini Dog Tail Gel Pens" },
+  { cat:'clearance', emoji:'🔗', priceHtml:'$8<sup>99</sup><span class="ref">$16.79</span>', price:8.99, title:"Bluelounge CableDrop, Bright" },
+];
+const CATEGORIES = [
+  { id:'all', label:'All Deals', tagline:'Everything on Hibbai right now.' },
+  { id:'home', label:'Home & Kitchen', tagline:'Stock the kitchen and tidy the house for less.' },
+  { id:'electronics', label:'Electronics', tagline:'Screens, sound, and power for everything you own.' },
+  { id:'computers', label:'Computers', tagline:'Ports, printers, and everything for the home office.' },
+  { id:'tools', label:'Tools & Garden', tagline:'For the garage, the yard, and everything between.' },
+  { id:'sports', label:'Sports & Outdoors', tagline:'Gear up for the gym, the trail, and the backyard.' },
+  { id:'shirt', label:'Shirt', tagline:'Graphic tees, everyday basics, and one weird planet.' },
+  { id:'grocery', label:'Grocery & Household', tagline:'Beauty, wellness, and the stuff that keeps a house running.' },
+  { id:'clearance', label:'Clearance', tagline:"Final markdowns. Once it's gone, it's gone." },
+];
+let currentCategory = 'all';
+
+function renderCatChips(){
+  const row = document.getElementById('catChipRow');
+  row.innerHTML = CATEGORIES.map(c =>
+    `<button class="cat-chip${c.id===currentCategory?' active':''}" onclick="setCategory('${c.id}')">${c.label}</button>`
+  ).join('');
+}
+function setCategory(id){
+  currentCategory = id;
+  renderCatChips();
+  renderShopGrid();
+  document.getElementById('shopGridAnchor').scrollIntoView({behavior:'smooth'});
+  toast('Showing ' + CATEGORIES.find(c=>c.id===id).label);
+}
+function renderShopGrid(){
+  const cat = CATEGORIES.find(c => c.id === currentCategory);
+  document.getElementById('shopGridTitle').textContent = cat.label;
+  document.getElementById('shopGridSub').textContent = cat.tagline;
+  const list = currentCategory === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.cat === currentCategory);
+  document.getElementById('shopGrid').innerHTML = list.map(p => `
+    <div class="card">
+      <div class="card-img">${p.emoji}</div>
+      <div class="card-body">
+        <div class="card-price">${p.priceHtml}</div>
+        <div class="card-title">${p.title}</div>
+        <button class="add-btn" onclick="addToCart('${p.title.replace(/'/g,"\\'")}', ${p.price})">Add to Cart</button>
+      </div>
+    </div>
+  `).join('');
+}
+function addToCart(title, price){
+  HibbaiCart.addItem(title, price);
+  document.getElementById('cartCount').textContent = HibbaiCart.getCount();
+  toast('Added to cart: ' + title);
+}
+
+const HERO_SLIDES = [
+  { flag:'Never before seen finds', title:'DEBUT<br>DEALS' },
+  { flag:"Blink and it's gone", title:'FLASH<br>SALE' },
+  { flag:'Straight from the warehouse', title:'CLEAR<br>-ANCE' },
+  { flag:'One day only', title:'FLASH<br>-OFF' }
+];
+let heroIndex = 0;
+function renderHero(){
+  document.getElementById('heroFlag').textContent = HERO_SLIDES[heroIndex].flag;
+  document.getElementById('heroTitle').innerHTML = HERO_SLIDES[heroIndex].title;
+  document.getElementById('heroDots').innerHTML = HERO_SLIDES.map((s,i) =>
+    `<button class="${i===heroIndex?'active':''}" onclick="heroGoTo(${i})"></button>`
+  ).join('');
+}
+function heroShift(dir){ heroIndex = (heroIndex + dir + HERO_SLIDES.length) % HERO_SLIDES.length; renderHero(); }
+function heroGoTo(i){ heroIndex = i; renderHero(); }
+
+function submitVote(){
+  const choice = document.querySelector('input[name="poll"]:checked');
+  if (!choice){ toast('Pick an answer first'); return; }
+  const noPct = choice.value === 'no' ? 62 : 38;
+  const yesPct = 100 - noPct;
+  document.getElementById('pollForm').style.display = 'none';
+  const result = document.getElementById('pollResult');
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div class="poll-result-row"><span style="width:34px;">No</span><div class="poll-bar-track"><div class="poll-bar-fill" style="width:${noPct}%;"></div></div><span>${noPct}%</span></div>
+    <div class="poll-result-row"><span style="width:34px;">Yes</span><div class="poll-bar-track"><div class="poll-bar-fill" style="width:${yesPct}%;"></div></div><span>${yesPct}%</span></div>`;
+  document.getElementById('voteBtn').textContent = 'Voted';
+  document.getElementById('voteBtn').disabled = true;
+  document.getElementById('discussCount').textContent = 38;
+  toast('Vote counted!');
+}
+
+/* =========================================================
+   CART
+   ========================================================= */
+function toggleShips(){ document.getElementById('shipsDetail').classList.toggle('open'); }
+function changeQty(title, delta){
+  const cart = HibbaiCart.getCart();
+  const item = cart.find(i => i.title === title);
+  if (!item) return;
+  HibbaiCart.setQty(title, item.qty + delta);
+  renderCart();
+}
+function removeFromCart(title){ HibbaiCart.removeItem(title); toast('Removed: ' + title); renderCart(); }
+
+function tryCheckout(){
+  const cart = HibbaiCart.getCart();
+  if (cart.length === 0){ toast('Your cart is empty — add a deal first'); return; }
+  const user = HibbaiAuth.getCurrentUser();
+  if (!user){
+    toast('Sign in to check out');
+    pendingViewAfterLogin = 'checkout';
+    showView('account');
+    return;
+  }
+  startCheckout();
+}
+
+/* =========================================================
+   CHECKOUT — real Shipping / Payment / Review / Confirmation flow
+   ========================================================= */
+let checkoutStep = 1;
+let checkoutData = { name:'', address:'', city:'', zip:'', card:'', expiry:'', cvc:'' };
+
+function startCheckout(){
+  const user = HibbaiAuth.getCurrentUser();
+  checkoutData.name = user ? user.name : '';
+  checkoutStep = 1;
+  showView('checkout');
+}
+
+const CO_STEPS = ['Shipping', 'Payment', 'Review', 'Done'];
+function renderCheckoutSteps(){
+  document.getElementById('checkoutSteps').innerHTML = CO_STEPS.map((label, i) => {
+    const n = i + 1;
+    const cls = n < checkoutStep ? 'done' : (n === checkoutStep ? 'active' : '');
+    const line = i < CO_STEPS.length - 1 ? '<div class="co-line"></div>' : '';
+    return `<div class="co-step ${cls}"><div class="co-dot">${n < checkoutStep ? '✓' : n}</div><span class="co-label">${label}</span></div>${line}`;
+  }).join('');
+}
+
+function renderCheckout(){
+  renderCheckoutSteps();
+  const content = document.getElementById('checkoutStepContent');
+  if (checkoutStep === 1){
+    content.innerHTML = `
+      <div class="checkout-card">
+        <h2>Shipping information</h2>
+        <div class="field" id="fieldName"><label>Full name</label><input id="coName" type="text" value="${checkoutData.name}" placeholder="Jane Hibber"></div>
+        <div class="field" id="fieldAddress"><label>Address</label><input id="coAddress" type="text" value="${checkoutData.address}" placeholder="123 Deal Street"></div>
+        <div class="co-field-row">
+          <div class="field" id="fieldCity"><label>City</label><input id="coCity" type="text" value="${checkoutData.city}" placeholder="Austin"></div>
+          <div class="field" id="fieldZip"><label>ZIP code</label><input id="coZip" type="text" inputmode="numeric" value="${checkoutData.zip}" placeholder="78701"></div>
+        </div>
+        <div class="error-msg" id="coError1"></div>
+        <div class="co-actions">
+          <button class="co-back-btn" onclick="showView('cart')">Back to Cart</button>
+          <button class="co-next-btn" onclick="coSubmitShipping()">Continue to Payment</button>
+        </div>
+      </div>`;
+  } else if (checkoutStep === 2){
+    content.innerHTML = `
+      <div class="checkout-card">
+        <h2>Payment</h2>
+        <div class="co-note">Demo checkout — no real payment is processed and no card data is stored.</div>
+        <div class="field" id="fieldCard"><label>Card number</label><input id="coCard" type="text" inputmode="numeric" value="${checkoutData.card}" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCardNumber(this)"></div>
+        <div class="co-field-row">
+          <div class="field" id="fieldExpiry"><label>Expiry</label><input id="coExpiry" type="text" inputmode="numeric" value="${checkoutData.expiry}" placeholder="MM/YY" maxlength="5" oninput="formatExpiry(this)"></div>
+          <div class="field" id="fieldCvc"><label>CVC</label><input id="coCvc" type="text" inputmode="numeric" value="${checkoutData.cvc}" placeholder="123" maxlength="4"></div>
+        </div>
+        <div class="error-msg" id="coError2"></div>
+        <div class="co-actions">
+          <button class="co-back-btn" onclick="checkoutStep=1; renderCheckout();">Back</button>
+          <button class="co-next-btn" onclick="coSubmitPayment()">Review Order</button>
+        </div>
+      </div>`;
+  } else if (checkoutStep === 3){
+    const cart = HibbaiCart.getCart();
+    const subtotal = HibbaiCart.getSubtotal();
+    const shipping = 6.00;
+    const rows = cart.map(i => `<div class="co-review-row"><span>${i.title} &times;${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('');
+    content.innerHTML = `
+      <div class="checkout-card">
+        <h2>Review your order</h2>
+        <div style="font-size:13.5px;color:var(--muted);margin-bottom:14px;">Shipping to ${checkoutData.name}, ${checkoutData.address}, ${checkoutData.city} ${checkoutData.zip}</div>
+        ${rows}
+        <div class="co-review-row"><span>Shipping</span><span>$${shipping.toFixed(2)}</span></div>
+        <div class="co-review-row"><span>Total</span><span>$${(subtotal+shipping).toFixed(2)}</span></div>
+        <div class="co-actions">
+          <button class="co-back-btn" onclick="checkoutStep=2; renderCheckout();">Back</button>
+          <button class="co-next-btn" onclick="coPlaceOrder()">Place Order</button>
+        </div>
+      </div>`;
+  } else {
+    const orderNo = 'HB-' + Math.floor(100000 + Math.random()*899999);
+    content.innerHTML = `
+      <div class="checkout-card co-confirm">
+        <div class="big-check">🎉</div>
+        <h2>Order placed!</h2>
+        <p>Thanks, ${checkoutData.name.split(' ')[0] || 'Hibber'} — your deals are on the way.</p>
+        <div class="order-no">${orderNo}</div>
+        <div class="co-actions">
+          <button class="co-next-btn" onclick="showView('shop')">Continue Shopping</button>
+        </div>
+      </div>`;
+  }
+}
+
+function markFieldError(id, hasError){
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('error', hasError);
+}
+function formatCardNumber(input){
+  let digits = input.value.replace(/\D/g,'').slice(0,16);
+  input.value = digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+}
+function formatExpiry(input){
+  let digits = input.value.replace(/\D/g,'').slice(0,4);
+  if (digits.length >= 3) input.value = digits.slice(0,2) + '/' + digits.slice(2);
+  else input.value = digits;
+}
+
+function coSubmitShipping(){
+  const name = document.getElementById('coName').value.trim();
+  const address = document.getElementById('coAddress').value.trim();
+  const city = document.getElementById('coCity').value.trim();
+  const zip = document.getElementById('coZip').value.trim();
+  const err = document.getElementById('coError1');
+
+  const zipValid = /^\d{5}(-\d{4})?$/.test(zip);
+  markFieldError('fieldName', !name);
+  markFieldError('fieldAddress', !address);
+  markFieldError('fieldCity', !city);
+  markFieldError('fieldZip', !zipValid);
+
+  if (!name || !address || !city || !zipValid){
+    err.textContent = !zip ? 'Fill in every field to continue.' : (!zipValid ? 'Enter a valid 5-digit ZIP code.' : 'Fill in every field to continue.');
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  Object.assign(checkoutData, { name, address, city, zip });
+  checkoutStep = 2;
+  renderCheckout();
+}
+function coSubmitPayment(){
+  const card = document.getElementById('coCard').value.trim();
+  const expiry = document.getElementById('coExpiry').value.trim();
+  const cvc = document.getElementById('coCvc').value.trim();
+  const err = document.getElementById('coError2');
+
+  const cardValid = card.replace(/\s/g,'').length >= 12;
+  const expiryValid = /^\d{2}\/\d{2}$/.test(expiry);
+  const cvcValid = cvc.length >= 3;
+  markFieldError('fieldCard', !cardValid);
+  markFieldError('fieldExpiry', !expiryValid);
+  markFieldError('fieldCvc', !cvcValid);
+
+  if (!cardValid || !expiryValid || !cvcValid){
+    err.textContent = !cardValid ? 'Enter a valid card number.' : (!expiryValid ? 'Enter expiry as MM/YY.' : 'Enter a valid CVC.');
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  Object.assign(checkoutData, { card, expiry, cvc });
+  checkoutStep = 3;
+  renderCheckout();
+}
+function coPlaceOrder(){
+  HibbaiCart.clear();
+  renderHeader();
+  checkoutStep = 4;
+  renderCheckout();
+}
+
+function renderCart(){
+  const cart = HibbaiCart.getCart();
+  const count = HibbaiCart.getCount();
+  document.getElementById('cartCount').textContent = count;
+  document.getElementById('cartTitle').textContent = `Shopping Cart (${count} item${count===1?'':'s'})`;
+  document.getElementById('itemsLine').textContent = `You've got ${count} item${count===1?'':'s'} in your cart.`;
+  document.getElementById('subtotalLine').textContent = 'Subtotal: $' + HibbaiCart.getSubtotal().toFixed(2);
+  document.getElementById('checkoutBtn').classList.toggle('ready', cart.length > 0);
+
+  const body = document.getElementById('cartBody');
+  if (cart.length === 0){
+    body.innerHTML = `
+      <div class="empty-box">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div class="empty-bubble">Hello? It's getting lonely in here…</div>
+          <div class="empty-monkey">🐵</div>
+        </div>
+        <div class="divider-v"></div>
+        <div class="signin-block"><a href="#" onclick="showView('account'); return false;">Sign in</a> or <a href="#" onclick="showView('account'); return false;">sign up for an account</a></div>
+      </div>`;
+    return;
+  }
+  body.innerHTML = '<div class="cart-items">' + cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-img">📦</div>
+      <div class="cart-item-info">
+        <div class="cart-item-title">${item.title}</div>
+        <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+      </div>
+      <div class="qty-control">
+        <button onclick="changeQty('${item.title.replace(/'/g,"\\'")}', -1)">–</button>
+        <span>${item.qty}</span>
+        <button onclick="changeQty('${item.title.replace(/'/g,"\\'")}', 1)">+</button>
+      </div>
+      <div class="cart-item-total">$${(item.price*item.qty).toFixed(2)}</div>
+      <button class="remove-link" onclick="removeFromCart('${item.title.replace(/'/g,"\\'")}')">Remove</button>
+    </div>
+  `).join('') + '</div>';
+}
+
+/* =========================================================
+   ACCOUNT (real inline sign-in / sign-up flow)
+   ========================================================= */
+let acctMode = 'signin';
+function toggleAcctMode(){
+  acctMode = acctMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = acctMode === 'signup';
+  document.getElementById('formTitle').textContent = isSignup ? 'Create your Hibbai! account' : 'Sign in to Hibbai!';
+  document.getElementById('formSub').textContent = isSignup
+    ? 'One account gets you Hibbai deals and the forums.'
+    : 'Create a free account to shop deals, track orders, and jump into the forums.';
+  document.getElementById('nameField').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('confirmField').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('submitBtn').textContent = isSignup ? 'Create account' : 'Sign in to Hibbai';
+  document.getElementById('switchLine').innerHTML = isSignup
+    ? 'Already have an account? <a href="#" onclick="toggleAcctMode(); return false;">Sign in instead</a>'
+    : 'New to Hibbai? <a href="#" onclick="toggleAcctMode(); return false;">Create your Hibbai! account</a>';
+  document.getElementById('errorMsg').style.display = 'none';
+}
+
+function submitAccountForm(){
+  const email = document.getElementById('acctEmail').value.trim();
+  const pw = document.getElementById('acctPw').value;
+  const err = document.getElementById('errorMsg');
+
+  if (!email || !pw){
+    err.textContent = 'Enter an email and password to continue.';
+    err.style.display = 'block';
+    return;
+  }
+
+  if (acctMode === 'signup'){
+    const name = document.getElementById('acctName').value.trim();
+    const pw2 = document.getElementById('acctPw2').value;
+    if (!name){ err.textContent = 'Enter your name.'; err.style.display = 'block'; return; }
+    if (pw !== pw2){ err.textContent = "Passwords don't match."; err.style.display = 'block'; return; }
+    if (HibbaiAuth.findAccount(email)){
+      err.textContent = 'An account with that email already exists — sign in instead.';
+      err.style.display = 'block';
+      return;
+    }
+    err.style.display = 'none';
+    HibbaiAuth.createAccount(name, email, pw);
+    toast('Account created! Welcome, ' + name.split(' ')[0] + '.');
+    afterLoginSuccess();
+    return;
+  }
+
+  const account = HibbaiAuth.findAccount(email);
+  if (!account){
+    err.textContent = "We don't recognize that email — create an account below.";
+    err.style.display = 'block';
+    return;
+  }
+  if (account.password !== pw){
+    err.textContent = 'Incorrect password.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  HibbaiAuth.setSession(email);
+  toast('Welcome back, ' + account.name.split(' ')[0] + '!');
+  afterLoginSuccess();
+}
+
+function afterLoginSuccess(){
+  renderHeader();
+  const target = pendingViewAfterLogin;
+  pendingViewAfterLogin = null;
+  if (target === 'checkout'){ startCheckout(); return; }
+  showView(target || 'account');
+}
+
+function signOut(){
+  HibbaiAuth.clearSession();
+  toast('Signed out');
+  renderHeader();
+  renderAccountView();
+}
+
+function renderAccountView(){
+  const user = HibbaiAuth.getCurrentUser();
+  if (user){
+    document.getElementById('guestView').style.display = 'none';
+    document.getElementById('profileView').style.display = 'block';
+    document.getElementById('avatarInitial').textContent = user.name.charAt(0).toUpperCase();
+    document.getElementById('profileName').textContent = user.name;
+    document.getElementById('profileEmail').textContent = user.email;
+    document.getElementById('statPosts').textContent = Math.floor((user.email.length * 7) % 40);
+    document.getElementById('statOrders').textContent = Math.floor((user.email.length * 3) % 12);
+    document.getElementById('statCartCount').textContent = HibbaiCart.getCount();
+  } else {
+    document.getElementById('guestView').style.display = 'block';
+    document.getElementById('profileView').style.display = 'none';
+  }
+}
+
+/* =========================================================
+   FORUMS
+   ========================================================= */
+function openModal(title, meta, body){
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMeta').textContent = meta;
+  document.getElementById('modalBody').textContent = body;
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function closeModal(){ document.getElementById('modalBackdrop').classList.remove('open'); }
+
+const LATEST_TOPICS = [
+  ['🎓','📌 Giveaway! Enter by 9/7 @ noon CT','shen','Shenanigans','1.8k','2m'],
+  ['🎲','🎲 Just for Fun! Dice Game (Part 67)','shen','Shenanigans','6.9k','2m'],
+  ['🐶','GAME 🧩 Pips','ebw','Everything but Hibbai','2.1k','2m,games'],
+  ['🌐','3-word Endless Story — Join in!!','ebw','Everything but Hibbai','7.3k','5m,games'],
+  ['🌐','GAME: GIF: Part 3 (Part 2)','ebw','Everything but Hibbai','5.5k','5m,games'],
+  ['💻','Amazon Basics 14" Laptop Tablet Bag 24 pack','computers','Computers','12','17m'],
+  ['🤖','iRobot C755920 Roomba Combo™ J7+','home','Home &amp; Kitchen','2','20m'],
+  ['🎭','How many answers does this poll have?','shen','Shenanigans','37','22m'],
+  ['🧻','Amazon Basics 2-Ply Ultra Facial Tissue','grocery','Grocery &amp; Household','14','25m'],
+  ['🎭','OMG! We have TWO new Volunteer Moderators!','shen','Shenanigans','5.6k','29m'],
+  ['🎭','OMG! We have a new volunteer moderator!!!','shen','Shenanigans','5.5k','31m'],
+  ['🐊','Cozy Corner 27: 🧀 Hanker for a hunk of cheese.','ebw','Everything but Hibbai','13.8k','38m,chat'],
+];
+function renderLatestList(){
+  const list = document.getElementById('latestList');
+  list.innerHTML = LATEST_TOPICS.map(([emoji, title, pillClass, pillLabel, count, meta], i) => {
+    const [time, word] = meta.split(',');
+    const isOrange = parseFloat(count) > 100 || count.includes('k');
+    return `<div class="latest-item" data-order="${i}">
+      <div class="avatar">${emoji}</div>
+      <div class="latest-body">
+        <button class="latest-title" onclick="openModal('${title.replace(/'/g,"\\'")}', '${pillLabel}${word ? ' &middot; '+word : ''} &middot; ${count} replies', 'This is a preview — open the real thread to read replies and join the conversation.')">${title}</button>
+        <div class="latest-tags"><span class="cat-pill ${pillClass}">${pillLabel}</span>${word ? `<span class="word-pill">${word}</span>` : ''}</div>
+      </div>
+      <div class="latest-meta"><span class="count${isOrange?' orange':''}">${count}</span>${time}</div>
+    </div>`;
+  }).join('');
+}
+function parseCount(text){ text = text.trim(); return text.endsWith('k') ? parseFloat(text)*1000 : parseFloat(text)||0; }
+function setTab(which){
+  document.getElementById('tabCategories').classList.toggle('active', which==='categories');
+  document.getElementById('tabLatest').classList.toggle('active', which==='latest');
+  document.getElementById('tabTop').classList.toggle('active', which==='top');
+  const grid = document.getElementById('forumGrid');
+  const label = document.getElementById('latestColLabel');
+  const list = document.getElementById('latestList');
+  if (which === 'categories'){
+    grid.classList.remove('full');
+    label.textContent = 'Latest';
+  } else {
+    grid.classList.add('full');
+    label.textContent = which === 'top' ? 'Top' : 'Latest';
+    const items = [...list.querySelectorAll('.latest-item')];
+    if (which === 'top') items.sort((a,b) => parseCount(b.querySelector('.count').textContent) - parseCount(a.querySelector('.count').textContent));
+    else items.sort((a,b) => a.dataset.order - b.dataset.order);
+    items.forEach(i => list.appendChild(i));
+  }
+  toast('Showing ' + which.charAt(0).toUpperCase() + which.slice(1));
+}
+document.addEventListener('DOMContentLoaded', function(){
+  const catCol = document.getElementById('categoryCol');
+  if (catCol) catCol.addEventListener('click', function(e){
+    const row = e.target.closest('.cat-row');
+    if (!row) return;
+    const badges = [...row.querySelectorAll('.cat-badge')].map(b => b.textContent).join(' ');
+    const desc = row.querySelector('.cat-desc') ? row.querySelector('.cat-desc').textContent.trim() : '';
+    const count = row.querySelector('.cat-count').textContent.trim();
+    openModal(badges, count, desc);
+  });
+});
+function toggleSearch(){ document.getElementById('searchBox').classList.toggle('open'); document.getElementById('menuDropdown').classList.remove('open'); }
+function filterTopics(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('#latestList .latest-item').forEach(item => {
+    const title = item.querySelector('.latest-title').textContent.toLowerCase();
+    item.style.display = title.includes(q) ? '' : 'none';
+  });
+}
+function toggleMenu(){ document.getElementById('menuDropdown').classList.toggle('open'); document.getElementById('searchBox').classList.remove('open'); }
+function closeMenu(){ document.getElementById('menuDropdown').classList.remove('open'); }
+document.addEventListener('click', function(e){
+  if (!e.target.closest('.actions')){
+    document.getElementById('menuDropdown').classList.remove('open');
+    document.getElementById('searchBox').classList.remove('open');
+  }
+});
+function toggleDark(){ document.body.classList.toggle('dark'); document.getElementById('darkToggle').classList.toggle('active'); }
+let moreLoaded = false;
+function loadMore(){
+  if (moreLoaded){ toast('No more topics to load'); return; }
+  const list = document.getElementById('latestList');
+  const extras = [
+    ['🧦','Sock Derby: vote for the ugliest pair','shen','Shenanigans','412','41m'],
+    ['🎧','JBL Clip 5 Waterproof Speaker','computers','Electronics','9','44m'],
+    ['🌵','Caption This Cactus (Part 12)','ebw','Everything but Hibbai','3.4k','48m']
+  ];
+  extras.forEach(([emoji,title,pillClass,pillLabel,count,time]) => {
+    const div = document.createElement('div');
+    div.className = 'latest-item';
+    div.dataset.order = document.querySelectorAll('#latestList .latest-item').length;
+    div.innerHTML = `<div class="avatar">${emoji}</div>
+      <div class="latest-body">
+        <button class="latest-title" onclick="openModal('${title}', '${pillLabel} &middot; ${count} replies', 'This is a preview — open the real thread to read replies.')">${title}</button>
+        <div class="latest-tags"><span class="cat-pill ${pillClass}">${pillLabel}</span></div>
+      </div>
+      <div class="latest-meta"><span class="count">${count}</span>${time}</div>`;
+    list.appendChild(div);
+  });
+  moreLoaded = true;
+  document.getElementById('moreBtn').textContent = 'No more topics';
+  toast('Loaded more topics');
+}
+const LEADERBOARD_DATA = {
+  week: [
+    { name:'GreenGrottoGary', avatar:'🐊', pts:4820 },
+    { name:'DealOMeterDan', avatar:'📟', pts:3910 },
+    { name:'ShirtDerbySal', avatar:'👕', pts:3475 },
+    { name:'BocBandit', avatar:'📦', pts:2960 },
+    { name:'HibbaiWriterFan', avatar:'🎓', pts:2210 }
+  ],
+  alltime: [
+    { name:'BocBandit', avatar:'📦', pts:88410 },
+    { name:'GreenGrottoGary', avatar:'🐊', pts:76200 },
+    { name:'PipsPlayerOne', avatar:'🐶', pts:61550 },
+    { name:'ShirtDerbySal', avatar:'👕', pts:54890 },
+    { name:'DealOMeterDan', avatar:'📟', pts:49020 }
+  ]
+};
+function setLeaderboardRange(range){
+  document.querySelectorAll('.lb-toggle-btn').forEach(b => b.classList.toggle('active', b.dataset.range === range));
+  document.getElementById('leaderboardList').innerHTML = LEADERBOARD_DATA[range].map((u,i) => `
+    <div class="lb-row">
+      <span class="lb-rank ${i===0?'gold':''}">${i+1}</span>
+      <span class="lb-avatar">${u.avatar}</span>
+      <span class="lb-name">${u.name}</span>
+      <span class="lb-points">${u.pts.toLocaleString()} pts</span>
+    </div>`).join('');
+}
+
+/* =========================================================
+   BRAND KIT
+   ========================================================= */
+function mascotSvg(fillMode){
+  const fill = fillMode === 'coral' ? '#FF5A36' : '#fff';
+  const stroke = fillMode === 'coral' ? 'none' : '#1a1a1a';
+  const sw = fillMode === 'coral' ? '0' : '1.6';
+  return `<svg width="64" height="64" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>
+    <circle cx="11" cy="13.5" r="1.9" fill="#1a1a1a"/><circle cx="19" cy="13.5" r="1.9" fill="#1a1a1a"/>
+    <path d="M11 18.5C12.6 20.6 17.4 20.6 19 18.5" stroke="#1a1a1a" stroke-width="1.9" stroke-linecap="round" fill="none"/></svg>`;
+}
+function fullLockupSvgFile(mascotFill, textFill, bangFill, tagline){
+  const mascot = `<g transform="translate(6,9)">${mascotSvg(mascotFill).replace(/<svg[^>]*>|<\/svg>/g,'')}</g>`;
+  const text = `<text x="90" y="42" font-family="Helvetica, Arial, sans-serif" font-size="34" font-style="italic" font-weight="900" fill="${textFill}">Hibbai<tspan fill="${bangFill}">!</tspan></text>`;
+  const tag = tagline ? `<text x="92" y="58" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="${textFill}">${tagline}</text>` : '';
+  return `<svg width="320" height="80" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">${mascot}${text}${tag}</svg>`;
+}
+const BK_ASSETS = [
+  { id:'primary-lockup', name:'Primary Lockup', type:'logo', bg:'coral', added:'2026-09-03',
+    previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('outline')}<span style="font-size:26px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span></div>`,
+    file: () => fullLockupSvgFile('#fff','#fff','#fff', null) },
+  { id:'on-white-lockup', name:'On White', type:'logo', bg:'light', added:'2026-09-03',
+    previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<span style="font-size:26px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></span></div>`,
+    file: () => fullLockupSvgFile('#FF5A36','#1a1a1a','#FF5A36', null) },
+  { id:'reversed-lockup', name:'Reversed', type:'logo', bg:'dark', added:'2026-09-02',
+    previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<span style="font-size:26px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</span></div>`,
+    file: () => fullLockupSvgFile('#FF5A36','#fff','#fff', null) },
+  { id:'shop-master-lockup', name:'Shop Master Lockup', type:'logo', bg:'coral', added:'2026-09-01',
+    previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('outline')}<div><div style="font-size:22px;font-weight:900;font-style:italic;color:#fff;">Hibbai!</div><div style="font-size:10px;font-weight:600;color:#fff;">shop &middot; chat &middot; win</div></div></div>`,
+    file: () => fullLockupSvgFile('#fff','#fff','#fff','shop &#183; chat &#183; win') },
+  { id:'forums-sublockup', name:'Forums Sub-Brand', type:'logo', bg:'light', added:'2026-09-01',
+    previewHtml: `<div style="display:flex;align-items:center;gap:10px;">${mascotSvg('coral')}<div><div style="font-size:22px;font-weight:900;font-style:italic;color:#1a1a1a;">Hibbai<span style="color:#FF5A36;">!</span></div><div style="font-size:10px;font-weight:600;color:#6b7a72;">forums</div></div></div>`,
+    file: () => fullLockupSvgFile('#FF5A36','#1a1a1a','#FF5A36','forums') },
+  { id:'mascot-fill', name:'Mascot — Fill', type:'icon', bg:'light', added:'2026-08-28',
+    previewHtml: mascotSvg('coral'), file: () => mascotSvg('coral').replace('width="64" height="64"','width="120" height="120"') },
+  { id:'mascot-outline', name:'Mascot — Outline', type:'icon', bg:'coral', added:'2026-08-28',
+    previewHtml: mascotSvg('outline'), file: () => mascotSvg('outline').replace('width="64" height="64"','width="120" height="120"') },
+  { id:'icon-deal-chatter', name:'Icon — Deal Chatter', type:'icon', bg:'light', added:'2026-08-20',
+    previewHtml: `<div style="width:52px;height:52px;border-radius:50%;background:#dff5e6;display:flex;align-items:center;justify-content:center;font-size:24px;">🎉</div>`,
+    file: () => `<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="40" fill="#dff5e6"/><text x="40" y="52" font-size="34" text-anchor="middle">&#127881;</text></svg>` },
+  { id:'graphic-chat-bubbles', name:'Chat Bubble Sticker Sheet', type:'graphic', bg:'light', added:'2026-08-15',
+    previewHtml: `<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+      <span style="background:#8a1c47;color:#fff;font-weight:800;font-size:10px;padding:4px 8px;border-radius:4px;">OMG</span>
+      <span style="background:#e9a7d6;color:#1a1a1a;font-weight:800;font-size:10px;padding:6px;border-radius:50%;">LOL</span>
+      <span style="background:#FFD166;color:#1a1a1a;font-weight:800;font-size:10px;padding:4px 8px;border-radius:4px;">WTF?!</span></div>`,
+    file: () => `<svg width="300" height="140" viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="20" width="70" height="34" rx="8" fill="#8a1c47"/><text x="45" y="42" font-family="Helvetica" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">OMG</text>
+      <circle cx="150" cy="50" r="32" fill="#e9a7d6"/><text x="150" y="56" font-family="Helvetica" font-size="14" font-weight="800" fill="#1a1a1a" text-anchor="middle">LOL</text>
+      <rect x="210" y="20" width="80" height="34" rx="8" fill="#FFD166"/><text x="250" y="42" font-family="Helvetica" font-size="14" font-weight="800" fill="#1a1a1a" text-anchor="middle">WTF?!</text></svg>` },
+  { id:'graphic-banner', name:'Coral Banner Graphic', type:'graphic', bg:'coral', added:'2026-08-10',
+    previewHtml: `<div style="display:flex;align-items:center;gap:8px;">${mascotSvg('outline')}<span style="font-size:18px;font-weight:900;font-style:italic;color:#fff;">Welcome!</span></div>`,
+    file: () => `<svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg"><rect width="400" height="140" fill="#FF5A36"/><g transform="translate(24,34)">${mascotSvg('outline').replace(/<svg[^>]*>|<\/svg>/g,'')}</g><text x="110" y="80" font-family="Helvetica" font-size="30" font-style="italic" font-weight="900" fill="#fff">Welcome to our community!</text></svg>` }
+];
+let bkFilters = { type:'all', bg:'all' };
+function bkSetFilter(kind, value){
+  bkFilters[kind] = value;
+  document.querySelectorAll(`.chip[data-filter="${kind}"]`).forEach(c => c.classList.toggle('active', c.dataset.value === value));
+  bkRender();
+}
+function bkSlug(name){ return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+function downloadAsset(id){
+  const asset = BK_ASSETS.find(a => a.id === id);
+  if (!asset) return;
+  try {
+    const svgText = asset.file();
+    const blob = new Blob([svgText], { type:'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = bkSlug(asset.name) + '.svg';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=> URL.revokeObjectURL(url), 1000);
+    toast('Downloaded ' + asset.name + '.svg');
+  } catch(e){
+    toast('Download blocked by this preview — open in a full browser tab to download.');
+  }
+}
+function bkRender(){
+  const q = document.getElementById('bkSearchInput').value.trim().toLowerCase();
+  const sort = document.getElementById('bkSortSelect').value;
+  let list = BK_ASSETS.filter(a => {
+    if (bkFilters.type !== 'all' && a.type !== bkFilters.type) return false;
+    if (bkFilters.bg !== 'all' && a.bg !== bkFilters.bg) return false;
+    if (q && !a.name.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (sort === 'name') list.sort((x,y) => x.name.localeCompare(y.name));
+  else list.sort((x,y) => new Date(y.added) - new Date(x.added));
+  document.getElementById('bkResultCount').textContent = `${list.length} asset${list.length===1?'':'s'}`;
+  const grid = document.getElementById('bkAssetGrid');
+  grid.innerHTML = list.length === 0
+    ? `<div style="grid-column:1/-1;padding:50px 0;text-align:center;color:var(--muted);">No assets match your search.</div>`
+    : list.map(a => `
+      <div class="asset-card">
+        <div class="asset-stage bg-${a.bg}">${a.previewHtml}</div>
+        <div class="asset-meta">
+          <div class="asset-name">${a.name}</div>
+          <div class="asset-sub">SVG &middot; added ${new Date(a.added).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div>
+          <button class="dl-btn" onclick="downloadAsset('${a.id}')">Download SVG</button>
+        </div>
+      </div>`).join('');
+}
+function copyHex(hex){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(hex).then(() => toast('Copied ' + hex), () => fallbackCopy(hex));
+  } else fallbackCopy(hex);
+}
+function fallbackCopy(text){
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('Copied ' + text);
+  } catch(e){ toast(text + ' — copy it manually'); }
+}
+const COLORS = [
+  { name:'Hibbai Coral', hex:'#FF5A36', rgb:'rgb(255,90,54)' },
+  { name:'Coral Dark', hex:'#E14F3D', rgb:'rgb(225,79,61)' },
+  { name:'Deep Plum', hex:'#3A1440', rgb:'rgb(58,20,64)' },
+  { name:'Ink', hex:'#1A1A1A', rgb:'rgb(26,26,26)' },
+  { name:'Debut Yellow', hex:'#FFD166', rgb:'rgb(255,209,102)' },
+  { name:'Champagne', hex:'#F7E7CE', rgb:'rgb(247,231,206)' },
+];
+function renderColorSwatches(){
+  document.getElementById('colorSwatchGrid').innerHTML = COLORS.map(c => `
+    <div class="swatch">
+      <div class="swatch-color" style="background:${c.hex};"></div>
+      <div class="swatch-meta">
+        <span style="font-weight:700;font-size:13px;display:block;">${c.name}</span>
+        <span style="color:var(--muted);font-family:monospace;font-size:12px;">${c.hex} &middot; ${c.rgb}</span>
+        <button class="swatch-copy" onclick="copyHex('${c.hex}')">Copy HEX</button>
+      </div>
+    </div>`).join('');
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', function(){
+  renderCatChips();
+  renderShopGrid();
+  renderHero();
+  renderLatestList();
+  setLeaderboardRange('week');
+  renderColorSwatches();
+  bkRender();
+  renderHeader();
+  showView('shop');
+});
+</script>
+
+</body>
+</html>

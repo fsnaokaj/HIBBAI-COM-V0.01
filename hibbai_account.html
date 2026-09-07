@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account - Hibbai!</title>
+<style>
+  :root{
+    --hibbai-green:#FF5A36;
+    --hibbai-ink:#1a1a1a;
+    --hibbai-pill:#3A1440;
+    --hibbai-muted:#6b7a72;
+    --hibbai-border:#d8ded9;
+    --hibbai-link:#B34700;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:"Helvetica Neue", Arial, sans-serif; color:var(--hibbai-ink); background:#fff; }
+  a{ color:var(--hibbai-link); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+
+  .main-nav{ background:var(--hibbai-green); padding:14px 24px; display:flex; align-items:center; justify-content:space-between; }
+  .logo-block{
+    display:inline-flex; align-items:center; gap:9px; cursor:pointer;
+    background:#fff; border-radius:8px; padding:7px 14px 7px 10px; line-height:1; text-decoration:none;
+  }
+  .logo-mark{ flex-shrink:0; display:block; }
+  .logo-text{ display:flex; flex-direction:column; line-height:1; }
+  .logo-block .wordmark{ font-size:23px; font-weight:900; font-style:italic; line-height:1; }
+  .logo-block .wordmark .wm-h{ color:var(--hibbai-ink); }
+  .logo-block .wordmark .wm-bang{ color:var(--hibbai-green); margin-left:1px; }
+  .logo-block .subtag{ font-size:10px; font-weight:600; color:var(--hibbai-ink); margin-top:3px; display:flex; gap:3px; }
+  .logo-block .subtag .smile{ color:#f79400; font-weight:900; }
+  .nav-actions{ display:flex; align-items:center; gap:26px; }
+  .nav-action{ display:flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:700; color:var(--hibbai-ink); text-decoration:none; }
+  .nav-action .ic{ font-size:19px; }
+  .cart-count{
+    position:absolute; top:-8px; right:-10px; background:var(--hibbai-pill); color:#fff;
+    font-size:10px; font-weight:800; border-radius:50%; width:17px; height:17px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .cart-badge{ position:relative; }
+
+  .wrap{ max-width:440px; margin: 56px auto; padding: 0 24px; }
+  .wrap h1{ font-size:24px; margin:0 0 6px; }
+  .wrap p.sub{ color:var(--hibbai-muted); font-size:14px; margin:0 0 28px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; }
+  .field input{
+    width:100%; padding:11px 12px; border:1px solid var(--hibbai-border); border-radius:6px; font-size:14px;
+  }
+  .signin-btn{
+    width:100%; background:var(--hibbai-pill); color:#fff; border:none; border-radius:6px;
+    padding:13px; font-size:15px; font-weight:700; cursor:pointer; margin-top:8px;
+  }
+  .amazon-note{
+    margin-top:22px; padding:14px 16px; background:#f4f6f5; border-radius:6px; font-size:13px; color:#333;
+  }
+  .switch-line{ margin-top:22px; font-size:13.5px; text-align:center; }
+  .error-msg{ color:#b23a3a; font-size:12.5px; margin-top:-8px; margin-bottom:12px; display:none; }
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--hibbai-ink); color:#fff; padding:12px 20px; border-radius:8px;
+    font-size:13.5px; font-weight:600; opacity:0; pointer-events:none; transition:all .25s ease;
+    z-index:999; max-width:80vw; text-align:center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .profile-card{
+    border:1px solid var(--hibbai-border); border-radius:10px; padding:26px; text-align:center;
+  }
+  .avatar-circle{
+    width:64px; height:64px; border-radius:50%; background:var(--hibbai-green); color:#2E1A47;
+    display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800;
+    margin:0 auto 14px;
+  }
+  .profile-card h2{ margin:0 0 2px; font-size:19px; }
+  .profile-card .email{ color:var(--hibbai-muted); font-size:13.5px; margin-bottom:20px; }
+  .profile-stats{ display:flex; justify-content:center; gap:28px; margin-bottom:22px; }
+  .profile-stats div{ text-align:center; }
+  .profile-stats .num{ font-size:18px; font-weight:800; display:block; }
+  .profile-stats .lbl{ font-size:11.5px; color:var(--hibbai-muted); }
+  .profile-links{ text-align:left; border-top:1px solid var(--hibbai-border); padding-top:16px; margin-bottom:18px; }
+  .profile-links a{ display:block; font-size:14px; font-weight:600; color:var(--hibbai-ink); padding:9px 4px; }
+  .profile-links a:hover{ background:#f4f6f5; text-decoration:none; }
+  .signout-btn{
+    width:100%; background:#fff; color:var(--hibbai-ink); border:1px solid var(--hibbai-border); border-radius:6px;
+    padding:11px; font-size:14px; font-weight:700; cursor:pointer;
+  }
+
+  footer{ background:#f4f6f5; margin-top:60px; padding: 26px 24px; text-align:center; font-size:11.5px; color:var(--hibbai-muted); }
+</style>
+</head>
+<body>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="main-nav">
+    <a class="logo-block" href="hibbai_shop.html">
+      <svg class="logo-mark" width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M15 2.5C21.5 2.5 27 6.8 27 14.5C27 22.2 21.5 27.5 15 27.5C8.5 27.5 3 22.2 3 14.5C3 6.8 8.5 2.5 15 2.5Z" fill="#FF5A36"/>
+        <circle cx="11" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <circle cx="19" cy="13.5" r="1.7" fill="#1a1a1a"/>
+        <path d="M11 18.5C12.6 20.4 17.4 20.4 19 18.5" stroke="#1a1a1a" stroke-width="1.7" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="logo-text">
+        <div class="wordmark"><span class="wm-h">Hibbai</span><span class="wm-bang">!</span></div>
+        <div class="subtag">shop &middot; chat &middot; win</div>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a class="nav-action" href="hibbai_forums.html"><span class="ic">💬</span>Forums</a>
+      <a class="nav-action" href="hibbai_account.html" onclick="location.reload(); return false;"><span class="ic">👤</span>Account</a>
+      <a class="nav-action cart-badge" href="hibbai_cart.html"><span class="ic">🛒</span><span class="cart-count" id="cartCount">0</span></a>
+    </div>
+  </div>
+
+  <div class="wrap" id="guestView">
+    <h1 id="formTitle">Sign in to Hibbai!</h1>
+    <p class="sub" id="formSub">Create a free account to shop deals, track orders, and jump into the forums.</p>
+
+    <div class="field" id="nameField" style="display:none;">
+      <label for="name">Name</label>
+      <input id="name" type="text" placeholder="Jane Hibber">
+    </div>
+    <div class="field">
+      <label for="email">Email or mobile phone number</label>
+      <input id="email" type="text" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label for="pw">Password</label>
+      <input id="pw" type="password" placeholder="••••••••">
+    </div>
+    <div class="field" id="confirmField" style="display:none;">
+      <label for="pw2">Confirm password</label>
+      <input id="pw2" type="password" placeholder="••••••••">
+    </div>
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="signin-btn" id="submitBtn" onclick="submitForm()">Sign in to Hibbai</button>
+
+    <div class="amazon-note">
+      Your Hibbai login stays right here in this browser — this is a demo, nothing is sent anywhere.
+    </div>
+
+    <div class="switch-line" id="switchLine">
+      New to Hibbai? <a href="#" onclick="toggleMode(); return false;">Create your Hibbai! account</a>
+    </div>
+  </div>
+
+  <div class="wrap" id="profileView" style="display:none;">
+    <div class="profile-card">
+      <div class="avatar-circle" id="avatarInitial">W</div>
+      <h2 id="profileName">Hibber</h2>
+      <div class="email" id="profileEmail">you@example.com</div>
+      <div class="profile-stats">
+        <div><span class="num" id="statPosts">0</span><span class="lbl">Forum posts</span></div>
+        <div><span class="num" id="statOrders">0</span><span class="lbl">Orders</span></div>
+        <div><span class="num" id="statCartCount">0</span><span class="lbl">In cart</span></div>
+      </div>
+      <div class="profile-links">
+        <a href="hibbai_shop.html">Continue shopping</a>
+        <a href="hibbai_cart.html">View cart</a>
+        <a href="hibbai_forums.html">Go to forums</a>
+      </div>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <footer>Hibbai logos, site design, &amp; content © Hibbai, Inc. 2004-2026. All Rights Reserved.</footer>
+
+  <script>
+    function safeGet(key, fallback){
+      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+      catch(e){ return fallback; }
+    }
+    function safeSet(key, val){
+      try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+      catch(e){ return false; }
+    }
+    const HibbaiAuth = {
+      getAccounts(){ return safeGet('hibbai_accounts', []); },
+      saveAccounts(list){ safeSet('hibbai_accounts', list); },
+      findAccount(email){ return this.getAccounts().find(a => a.email.toLowerCase() === email.toLowerCase()); },
+      createAccount(name, email, password){
+        const accounts = this.getAccounts();
+        accounts.push({ name, email, password });
+        this.saveAccounts(accounts);
+        this.setSession(email);
+      },
+      setSession(email){ safeSet('hibbai_session', { email }); },
+      getSession(){ return safeGet('hibbai_session', null); },
+      clearSession(){ try { localStorage.removeItem('hibbai_session'); } catch(e){} },
+      getCurrentUser(){
+        const s = this.getSession();
+        if (!s) return null;
+        return this.findAccount(s.email) || { name: s.email.split('@')[0], email: s.email };
+      }
+    };
+    const HibbaiCart = {
+      getCart(){ return safeGet('hibbai_cart', []); },
+      getCount(){ return this.getCart().reduce((n,i)=>n+i.qty, 0); }
+    };
+
+    let toastTimer;
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+    }
+
+    let mode = 'signin';
+    function toggleMode(){
+      mode = mode === 'signin' ? 'signup' : 'signin';
+      const isSignup = mode === 'signup';
+      document.getElementById('formTitle').textContent = isSignup ? 'Create your Hibbai! account' : 'Sign in to Hibbai!';
+      document.getElementById('formSub').textContent = isSignup
+        ? 'One account gets you Hibbai deals and the forums.'
+        : 'Create a free account to shop deals, track orders, and jump into the forums.';
+      document.getElementById('nameField').style.display = isSignup ? 'block' : 'none';
+      document.getElementById('confirmField').style.display = isSignup ? 'block' : 'none';
+      document.getElementById('submitBtn').textContent = isSignup ? 'Create account' : 'Sign in to Hibbai';
+      document.getElementById('switchLine').innerHTML = isSignup
+        ? 'Already have an account? <a href="#" onclick="toggleMode(); return false;">Sign in instead</a>'
+        : 'New to Hibbai? <a href="#" onclick="toggleMode(); return false;">Create your Hibbai! account</a>';
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    function submitForm(){
+      const email = document.getElementById('email').value.trim();
+      const pw = document.getElementById('pw').value;
+      const err = document.getElementById('errorMsg');
+
+      if (!email || !pw){
+        err.textContent = 'Enter an email and password to continue.';
+        err.style.display = 'block';
+        return;
+      }
+
+      if (mode === 'signup'){
+        const name = document.getElementById('name').value.trim();
+        const pw2 = document.getElementById('pw2').value;
+        if (!name){
+          err.textContent = 'Enter your name.';
+          err.style.display = 'block';
+          return;
+        }
+        if (pw !== pw2){
+          err.textContent = "Passwords don't match.";
+          err.style.display = 'block';
+          return;
+        }
+        if (HibbaiAuth.findAccount(email)){
+          err.textContent = 'An account with that email already exists — sign in instead.';
+          err.style.display = 'block';
+          return;
+        }
+        err.style.display = 'none';
+        HibbaiAuth.createAccount(name, email, pw);
+        toast('Account created! Welcome, ' + name.split(' ')[0] + '.');
+        showProfile();
+        return;
+      }
+
+      const account = HibbaiAuth.findAccount(email);
+      if (!account){
+        err.textContent = "We don't recognize that email — create an account below.";
+        err.style.display = 'block';
+        return;
+      }
+      if (account.password !== pw){
+        err.textContent = 'Incorrect password.';
+        err.style.display = 'block';
+        return;
+      }
+      err.style.display = 'none';
+      HibbaiAuth.setSession(email);
+      toast('Welcome back, ' + account.name.split(' ')[0] + '!');
+      showProfile();
+    }
+
+    function signOut(){
+      HibbaiAuth.clearSession();
+      toast('Signed out');
+      showGuest();
+    }
+
+    function showProfile(){
+      const user = HibbaiAuth.getCurrentUser();
+      document.getElementById('guestView').style.display = 'none';
+      document.getElementById('profileView').style.display = 'block';
+      document.getElementById('avatarInitial').textContent = user.name.charAt(0).toUpperCase();
+      document.getElementById('profileName').textContent = user.name;
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('statPosts').textContent = Math.floor((user.email.length * 7) % 40);
+      document.getElementById('statOrders').textContent = Math.floor((user.email.length * 3) % 12);
+      document.getElementById('statCartCount').textContent = HibbaiCart.getCount();
+      document.getElementById('cartCount').textContent = HibbaiCart.getCount();
+    }
+    function showGuest(){
+      document.getElementById('guestView').style.display = 'block';
+      document.getElementById('profileView').style.display = 'none';
+      document.getElementById('cartCount').textContent = HibbaiCart.getCount();
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      if (HibbaiAuth.getCurrentUser()) showProfile(); else showGuest();
+    });
+  </script>
+
+</body>
+</html>
